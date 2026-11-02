@@ -9,12 +9,12 @@ The human thinks out loud while other work is running. Capture it right away, ke
 
 ## Decide what it is
 
-**A product idea or wish:** create a tracker issue with the label `labels.idea`.
+**A product idea or wish:** create a ticket in `tracker.project`, with status `tracker.statuses.idea` and label `tracker.labels.idea`.
 - Title: the idea in a few words.
 - Body: what the human wants, in their words, plus anything already found out and open questions. No acceptance criteria yet.
-- Search open issues first. If it extends an existing idea, add a comment to that issue instead.
-- Never add the `labels.ready` label. Ideas do not enter the pipeline until the human promotes them through a spec.
-- Tracker issues may be public. Leave out personal details such as names, banks or addresses.
+- Search existing tickets first. If it extends an existing idea, add a comment to that ticket instead.
+- Never use `tracker.statuses.ready`. Ideas do not enter the pipeline until the human promotes them through a spec.
+- If the tracker is publicly readable, leave out personal details such as names, banks or addresses.
 
 **A remark about how we work:** change the workflow, do not just remember it.
 - Applies to any project: edit `workflow-kit/`.

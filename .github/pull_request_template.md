@@ -1,4 +1,4 @@
-Closes #
+Closes <ticket id>
 
 ## What changed
 

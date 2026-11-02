@@ -2,16 +2,22 @@
   "$schema": "./workflow-kit/schemas/project-config.schema.json",
   "project": {
     "name": "CHANGE-ME",
-    "language": "en"
+    "language": "en",
+    "repo": "OWNER/REPO"
   },
   "tracker": {
-    "adapter": "github",
-    "repo": "OWNER/REPO",
-    "allowedAuthors": ["OWNER"],
+    "adapter": "linear",
+    "team": "TEAM-KEY",
+    "project": "CHANGE-ME",
+    "allowedAuthors": ["LINEAR-USER-ID"],
+    "statuses": {
+      "idea": "Backlog",
+      "ready": "Todo",
+      "inProgress": "In Progress",
+      "done": "Done"
+    },
     "labels": {
       "idea": "idea",
-      "ready": "ready",
-      "inProgress": "in-progress",
       "inReview": "in-review",
       "needsHuman": "needs-human",
       "ui": "ui"
