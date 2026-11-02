@@ -1,0 +1,491 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#EDF0E3">
+<title>Stilrichtungen Haushalts-App</title>
+<style>
+/* Layout: die Seite benimmt sich selbst wie die App, mit Kopfzeile, drei Bereichen und schwebender Tab Bar. */
+/* Farben, Radien und Schriften pro Richtung setzt das Skript aus DIRECTIONS als Tokens auf :root. */
+:root { --bg: #EDF0E3; --text: #1F2A22; padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #141C17; --text: #EEF2E6; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #141C17; --text: #EEF2E6; color-scheme: dark }
+
+/* Koppelt die Seite an die iOS-Textgröße. Alle Textgrößen stehen in rem, 1rem entspricht 17 pt. */
+html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+@supports (font: -apple-system-body) { html { font: -apple-system-body; } }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); font-weight: var(--w-body); line-height: 1.3; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 calc(6.5rem + env(safe-area-inset-bottom, 0px)); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button, input { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 30rem; margin-inline: auto; }
+
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: .5rem; margin-inline: -4px; padding-inline: 4px; }
+.top-row { display: flex; gap: 8px; align-items: center; max-width: 30rem; margin-inline: auto; }
+.seg { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 3px; background: var(--line); border-radius: var(--r-btn); }
+.seg button { min-height: 44px; border-radius: calc(var(--r-btn) - 3px); font-size: .88rem; font-weight: 600; color: var(--text2); overflow-wrap: anywhere; padding-inline: 2px; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.14); }
+.icon-btn { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); background: var(--line); }
+.icon-btn svg { width: 22px; height: 22px; }
+
+h1 { font-family: var(--font-display); font-weight: var(--w-display); font-size: 2rem; line-height: 1.15; letter-spacing: var(--track); margin: .5rem 0 .75rem; text-wrap: balance; }
+h2 { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.18rem; margin: 0; }
+h3 { font-size: .76rem; font-weight: 600; color: var(--text2); margin: 0 0 6px 4px; }
+p { margin: 0; }
+.view { display: grid; gap: 1.1rem; padding-top: .25rem; }
+
+.card { background: var(--surface); border-radius: var(--r-card); box-shadow: var(--card-shadow); border: var(--card-border); padding: var(--pad); display: grid; gap: .6rem; }
+.muted { color: var(--text2); }
+.small { font-size: .88rem; }
+.btn { min-height: 44px; padding: .5rem 1.1rem; border-radius: var(--r-btn); background: var(--accent); color: var(--on-accent); font-weight: 600; box-shadow: var(--btn-shadow); transition: transform .1s; }
+.btn:active { transform: translateY(2px); }
+.btn.quiet { background: var(--line); color: var(--text); box-shadow: none; }
+.btn:disabled { opacity: 1; background: var(--line); color: var(--text3); box-shadow: none; cursor: default; }
+
+.stage { background: var(--stage); border-radius: var(--r-card); position: relative; overflow: hidden; display: flex; justify-content: center; align-items: flex-end; padding: 1rem 0 .5rem; }
+.stage::before { content: ""; position: absolute; left: 8%; right: 8%; bottom: 7%; height: 14%; border-radius: 50%; background: var(--floor); }
+.fig { position: relative; flex: 0 1 48%; min-width: 0; min-height: 44px; display: block; border-radius: var(--r-inner); }
+.fig svg { display: block; width: 100%; height: auto; }
+.fig .breath { animation: breathe 4.5s ease-in-out infinite; transform-origin: 100px 220px; }
+.fig:nth-child(2) .breath { animation-delay: -1.7s; }
+.fig .eyes { animation: blink 5.5s infinite; transform-box: fill-box; transform-origin: center; }
+.fig.hop svg { animation: hop .36s ease-out; }
+@keyframes breathe { 50% { transform: scale(1.012, .988); } }
+@keyframes blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+@keyframes hop { 40% { transform: translateY(-5%); } }
+.ink { stroke: var(--ink); }
+.hint { text-align: center; }
+
+.trace { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.trace p { flex: 1 1 11rem; min-width: 0; }
+
+.screen-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.add { flex: none; width: 44px; height: 44px; border-radius: var(--r-btn); background: var(--accent); color: var(--on-accent); display: grid; place-items: center; box-shadow: var(--btn-shadow); }
+.add svg { width: 22px; height: 22px; }
+.group { background: var(--surface); border-radius: var(--r-card); box-shadow: var(--card-shadow); border: var(--card-border); overflow: hidden; list-style: none; margin: 0; padding: 0; }
+.row { width: 100%; min-height: 48px; display: flex; align-items: center; gap: .75rem; padding: .5rem var(--pad); text-align: left; }
+li + li .row { box-shadow: inset 0 1px 0 var(--line); }
+.tick { flex: none; width: 26px; height: 26px; display: grid; place-items: center; border: 2px solid var(--ctl); border-radius: var(--r-tick); color: transparent; }
+.tick svg { width: 16px; height: 16px; }
+.row[aria-pressed="true"] .tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.row[aria-pressed="true"] .name { text-decoration: line-through; color: var(--text3); }
+.name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.qty { flex: none; font-size: .88rem; color: var(--text2); font-variant-numeric: tabular-nums; }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: .75rem; }
+.swatch { display: grid; gap: 4px; min-width: 0; }
+.chip { height: 3rem; border-radius: var(--r-inner); box-shadow: inset 0 0 0 1px var(--line); display: grid; place-items: center; font-weight: 700; }
+.swatch b { font-weight: 600; font-size: .82rem; }
+.swatch span { font-size: .76rem; color: var(--text2); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.radii { display: flex; gap: .75rem; flex-wrap: wrap; }
+.radius { flex: 1 1 5.5rem; min-width: 0; display: grid; gap: 4px; }
+.radius i { display: block; height: 3.2rem; background: var(--line); border: 2px solid var(--ctl); }
+.radius span { font-size: .76rem; color: var(--text2); }
+.spec { display: grid; gap: .35rem; }
+.spec .d1 { font-family: var(--font-display); font-weight: var(--w-display); font-size: 2rem; line-height: 1.15; letter-spacing: var(--track); }
+.spec .d2 { font-family: var(--font-display); font-weight: var(--w-display); font-size: 1.3rem; line-height: 1.2; }
+.pair { display: grid; gap: .25rem; margin: 0; }
+.pair dt { font-weight: 600; font-size: .88rem; }
+.pair dd { margin: 0 0 .5rem; color: var(--text2); }
+
+.tabs { position: fixed; z-index: 6; left: 0; right: 0; bottom: 0; padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); pointer-events: none; }
+.tabs-in { pointer-events: auto; max-width: 30rem; margin-inline: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 5px; border-radius: var(--r-bar); background: var(--bar); -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5); box-shadow: 0 0 0 1px var(--line), 0 6px 22px rgba(0,0,0,.16); }
+.tab { min-height: 50px; border-radius: calc(var(--r-bar) - 5px); display: grid; justify-items: center; align-content: center; gap: 1px; color: var(--text2); font-size: .68rem; font-weight: 600; }
+.tab svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tab[aria-current="page"] { color: var(--accent); background: var(--line); }
+.tab[aria-current="page"] svg { fill: currentColor; fill-opacity: .25; }
+
+.scrim { position: fixed; inset: 0; z-index: 7; background: rgba(0,0,0,.34); }
+.sheet { position: fixed; z-index: 8; left: 0; right: 0; bottom: 0; height: 52dvh; max-width: 34rem; margin-inline: auto; background: var(--elev); border-radius: var(--r-sheet) var(--r-sheet) 0 0; padding: 0 max(16px, env(safe-area-inset-right, 0px)) calc(1rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: grid; grid-template-rows: auto auto 1fr; gap: .75rem; transition: height .22s ease, transform .22s ease; box-shadow: 0 -8px 30px rgba(0,0,0,.2); }
+.sheet.large { height: calc(100dvh - env(safe-area-inset-top, 0px) - 12px); }
+.grab { height: 28px; width: 100%; display: grid; place-items: center; touch-action: none; }
+.grab::before { content: ""; width: 38px; height: 5px; border-radius: 3px; background: var(--ctl); }
+.sheet-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .5rem; }
+.sheet-head h2 { font-size: 1rem; text-align: center; }
+.link { min-height: 44px; min-width: 44px; color: var(--accent); font-weight: 600; }
+.link:disabled { color: var(--text3); cursor: default; }
+.link.end { justify-self: end; text-align: right; }
+.link.start { justify-self: start; text-align: left; }
+.field { width: 100%; min-height: 48px; padding: .5rem .85rem; border-radius: var(--r-inner); border: 2px solid var(--ctl); background: var(--surface); }
+.sheet-body { display: grid; gap: .75rem; align-content: start; }
+.confirm { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fig .breath, .fig .eyes, .fig.hop svg { animation: none; }
+  .btn, .sheet { transition: none; }
+}
+</style>
+
+<div class="top">
+  <div class="top-row">
+    <div class="seg" role="group" aria-label="Stilrichtung" id="seg"></div>
+    <button class="icon-btn" id="modeBtn" aria-label="Hell und dunkel wechseln"></button>
+  </div>
+</div>
+<main class="wrap">
+  <section class="view" id="view-home"></section>
+  <section class="view" id="view-list" hidden></section>
+  <section class="view" id="view-style" hidden></section>
+</main>
+<nav class="tabs" aria-label="Bereiche"><div class="tabs-in" id="tabs"></div></nav>
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <button class="grab" id="grab" aria-label="Sheet-Größe wechseln"></button>
+  <div class="sheet-head">
+    <button class="link start" id="cancelBtn">Abbrechen</button>
+    <h2 id="sheetTitle">Hinzufügen</h2>
+    <button class="link end" id="doneBtn" disabled>Fertig</button>
+  </div>
+  <div class="sheet-body">
+    <input class="field" id="itemInput" placeholder="Zum Beispiel Haferflocken" aria-label="Was fehlt?" autocomplete="off">
+    <div class="confirm" id="confirm" hidden>
+      <span class="small muted">Eintrag verwerfen?</span>
+      <button class="btn quiet" id="discardBtn">Verwerfen</button>
+      <button class="btn quiet" id="keepBtn">Weiter bearbeiten</button>
+    </div>
+    <p class="small muted">Dieses Sheet zeigt Apples Muster: Griff, Abbrechen links, Fertig rechts, Wischen nach unten schließt und fragt bei Text nach.</p>
+  </div>
+</div>
+
+<script>
+const ROUNDED = 'ui-rounded, "Nunito", system-ui, sans-serif';
+const SYSTEM = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+const SERIF = 'ui-serif, "New York", Georgia, serif';
+
+const DIRECTIONS = {
+  a: {
+    name: 'Küche', title: 'Küche',
+    mood: 'Emaillegeschirr und Butter auf dem Küchentisch. Salbei als Grund, Tannengrün als Akzent, Tomate und Butter für Kleinigkeiten. Die Figur hat eine weiche Tintenlinie und kleine Punktaugen.',
+    plus: 'Freundlich und alltäglich. Die Linie trägt auch einfache Figuren, das hilft beim Charakter-Bogen.',
+    minus: 'Am wenigsten auffällig von den dreien. Die Tintenlinie muss in jeder Frisur und Haltung sitzen.',
+    fontNote: 'Titel und Text in ui-rounded (SF Pro Rounded auf dem iPhone). Titel Bold, Text Regular.',
+    font: { display: ROUNDED, body: ROUNDED, wd: 700, wb: 400, track: '-.01em' },
+    radius: { card: 20, inner: 12, btn: 999, bar: 999, sheet: 26, tick: '50%', pad: 16 },
+    shadows: { card: 'none', btn: 'none', border: '1px solid var(--line)' },
+    light: { bg: '#EDF0E3', surface: '#FBFBF4', elev: '#FFFFFF', text: '#1F2A22', text2: '#47544A', text3: '#5B685D', accent: '#24664A', onAccent: '#FFFFFF', second: '#AE3F27', sun: '#EDC04F', line: '#DDE2D1', ctl: '#7A8674', stage: '#DCE5C8', floor: '#C7D3AE', ink: '#26302A', bar: 'rgba(251,251,244,.9)' },
+    dark: { bg: '#141C17', surface: '#1F2A23', elev: '#29352D', text: '#EEF2E6', text2: '#C2CCBD', text3: '#A5B09F', accent: '#7FD0A6', onAccent: '#0D2A1C', second: '#F0977F', sun: '#EDC04F', line: '#35423A', ctl: '#84917F', stage: '#46594C', floor: '#384A3E', ink: '#141C17', bar: 'rgba(31,42,35,.9)' },
+    fig: 'line', top: '#2F7A59', top2: '#C8543A', trousers: '#44524A',
+  },
+  b: {
+    name: 'Abend', title: 'Abend',
+    mood: 'Bilderbuch zur blauen Stunde, wenn drinnen die Lampe angeht. Abendblau und Altrosa, Lampenlicht als einziger warmer Punkt. Serifen im Titel, flache Flächen ohne Linie, die Figur ist schlanker und hat kleine Augen.',
+    plus: 'Wirkt am erwachsensten. Dunkel sieht diese Richtung am besten aus, und abends benutzt ihr die App vermutlich am meisten.',
+    minus: 'Kann kühl wirken und ist am wenigsten verspielt. Für Haustiere und Shop später braucht sie mehr Wärme.',
+    fontNote: 'Titel in ui-serif (New York auf dem iPhone), Text in system-ui (SF Pro). Titel Semibold, Text Regular.',
+    font: { display: SERIF, body: SYSTEM, wd: 600, wb: 400, track: '0' },
+    radius: { card: 12, inner: 8, btn: 12, bar: 18, sheet: 16, tick: '8px', pad: 16 },
+    shadows: { card: 'none', btn: 'none', border: '1px solid var(--line)' },
+    light: { bg: '#F0EDF2', surface: '#FBFAFC', elev: '#FFFFFF', text: '#25233A', text2: '#4F4C66', text3: '#625F7A', accent: '#48427F', onAccent: '#FFFFFF', second: '#8C4A62', sun: '#E3B25C', line: '#E0DCE8', ctl: '#84809A', stage: '#E4DDEE', floor: '#D2C9E2', ink: '#25233A', bar: 'rgba(251,250,252,.9)' },
+    dark: { bg: '#16152A', surface: '#211F38', elev: '#2B2946', text: '#F1EDE4', text2: '#C8C4D6', text3: '#A8A4BC', accent: '#BDB6F2', onAccent: '#1D1A40', second: '#E6A5BC', sun: '#F0C674', line: '#37345A', ctl: '#8D89A8', stage: '#3A3760', floor: '#2D2A4E', ink: '#16152A', bar: 'rgba(33,31,56,.9)' },
+    fig: 'flat', top: '#5B5596', top2: '#A25C76', trousers: '#8A7A9E',
+  },
+  c: {
+    name: 'Kissen', title: 'Kissen',
+    mood: 'Prall und weich wie ein Sofakissen. Pfirsich und Himbeere, Petrol als Gegenpol. Dicke Knöpfe zum Drücken, große Radien, die Figur hat einen großen Kopf und große Augen.',
+    plus: 'Am niedlichsten und am spielerischsten. Passt gut zu Haustieren und Shop, und Kinderschema-Merkmale wirken nachweislich.',
+    minus: 'Das größte Risiko für Prinzip 4: Es kann schnell kindisch wirken. Himbeere auf Pfirsich ist auch die lauteste Palette.',
+    fontNote: 'Titel und Text in ui-rounded (SF Pro Rounded auf dem iPhone). Titel Heavy, Text Medium.',
+    font: { display: ROUNDED, body: ROUNDED, wd: 800, wb: 500, track: '0' },
+    radius: { card: 30, inner: 20, btn: 999, bar: 999, sheet: 34, tick: '50%', pad: 18 },
+    shadows: { card: '0 4px 0 var(--line)', btn: '0 3px 0 var(--press)', border: '0 solid transparent' },
+    light: { bg: '#FFF0EA', surface: '#FFFFFF', elev: '#FFFFFF', text: '#3F1F33', text2: '#6A4A5F', text3: '#7C5C71', accent: '#B42B5D', onAccent: '#FFFFFF', second: '#0F7470', sun: '#FFC562', line: '#F5DDD5', ctl: '#A07F92', stage: '#FFDCCB', floor: '#FBC6AE', ink: '#3F1F33', press: '#8A1F47', bar: 'rgba(255,255,255,.9)' },
+    dark: { bg: '#24141F', surface: '#33202D', elev: '#3E2A38', text: '#FFF0F4', text2: '#E2C8D4', text3: '#C6A8B8', accent: '#FF9FBF', onAccent: '#43102A', second: '#6FD6CF', sun: '#FFC562', line: '#4B3343', ctl: '#A58A9A', stage: '#5A3A4D', floor: '#472D3D', ink: '#24141F', press: '#C2638A', bar: 'rgba(51,32,45,.9)' },
+    fig: 'puffy', top: '#D1466F', top2: '#14857F', trousers: '#5A2A44',
+  },
+};
+
+const PEOPLE = {
+  mika: { name: 'Mika', look: 0 },
+  juno: { name: 'Juno', look: 1 },
+};
+const LOOKS = [
+  { skin: '#F2CBA5', hair: '#4A2F22', style: 0 },
+  { skin: '#A9704A', hair: '#231A1E', style: 2 },
+  { skin: '#E3A87C', hair: '#B5713A', style: 1 },
+  { skin: '#7A4B32', hair: '#2B2230', style: 0 },
+  { skin: '#F7DCC4', hair: '#C9A063', style: 2 },
+  { skin: '#C48A5E', hair: '#5B3522', style: 1 },
+];
+
+let items = [
+  { group: 'Frisch', name: 'Hafermilch', qty: '2 x', done: true },
+  { group: 'Frisch', name: 'Tomaten', qty: '500 g', done: false },
+  { group: 'Frisch', name: 'Basilikum', qty: '', done: false },
+  { group: 'Vorrat', name: 'Spülmaschinentabs', qty: '', done: false },
+  { group: 'Vorrat', name: 'Kaffee', qty: '250 g', done: false },
+];
+
+const state = { dir: 'a', view: 'home', mode: null, fav: null, thanked: false, large: false };
+try { state.fav = localStorage.getItem('haushalt-stil-favorit'); } catch (e) {}
+
+const VIEWS = { home: 'Zuhause', list: 'Liste', style: 'Stil' };
+const ICON = {
+  home: '<path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/>',
+  list: '<path d="M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM9 8h6M9 12h6M9 16h4"/>',
+  style: '<path d="M12 3a9 9 0 1 0 0 18c1.7 0 2.2-1.2 1.7-2.3-.7-1.4.2-2.7 1.8-2.7H18a3 3 0 0 0 3-3c0-5.2-4-10-9-10z"/><path d="M7.5 12h.01M10 7.5h.01M14.5 7.5h.01"/>',
+  sun: '<circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3 7 7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  moon: '<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  plus: '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
+  check: '<path d="M5 12.5 10 17l9-10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
+};
+const svg = (name, box = 24) => `<svg viewBox="0 0 ${box} ${box}" aria-hidden="true">${ICON[name]}</svg>`;
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* Tokens */
+const tokenCss = t => [
+  ['--bg', t.bg], ['--surface', t.surface], ['--elev', t.elev], ['--text', t.text], ['--text2', t.text2], ['--text3', t.text3],
+  ['--accent', t.accent], ['--on-accent', t.onAccent], ['--second', t.second], ['--sun', t.sun], ['--line', t.line], ['--ctl', t.ctl],
+  ['--stage', t.stage], ['--floor', t.floor], ['--ink', t.ink], ['--bar', t.bar], ['--press', t.press || 'transparent'],
+].map(([k, v]) => `${k}:${v}`).join(';');
+
+function applyTokens() {
+  const d = DIRECTIONS[state.dir];
+  const r = d.radius, f = d.font, s = d.shadows;
+  const fixed = `--font-display:${f.display};--font-body:${f.body};--w-display:${f.wd};--w-body:${f.wb};--track:${f.track};--r-card:${r.card}px;--r-inner:${r.inner}px;--r-btn:${r.btn === 999 ? '999px' : r.btn + 'px'};--r-bar:${r.bar === 999 ? '32px' : r.bar + 'px'};--r-sheet:${r.sheet}px;--r-tick:${r.tick};--pad:${r.pad}px;--card-shadow:${s.card};--btn-shadow:${s.btn};--card-border:${s.border}`;
+  let tag = $('tokens');
+  if (!tag) { tag = document.createElement('style'); tag.id = 'tokens'; document.head.appendChild(tag); }
+  tag.textContent = `:root{${fixed};${tokenCss(d.light)}}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${tokenCss(d.dark)};color-scheme:dark}}
+:root[data-theme="dark"]{${tokenCss(d.dark)};color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}`;
+  document.querySelector('meta[name=theme-color]').content = currentTokens().bg;
+}
+const isDark = () => document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+const currentTokens = () => DIRECTIONS[state.dir][isDark() ? 'dark' : 'light'];
+
+/* Kontrast */
+const lum = hex => {
+  const n = parseInt(hex.slice(1), 16);
+  const c = [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
+  return .2126 * c[0] + .7152 * c[1] + .0722 * c[2];
+};
+const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const fmt = n => n.toFixed(1).replace('.', ',');
+function audit() {
+  const out = [];
+  for (const [id, d] of Object.entries(DIRECTIONS)) for (const mode of ['light', 'dark']) {
+    const t = d[mode];
+    for (const fg of ['text', 'text2', 'text3', 'accent', 'second']) for (const bg of ['bg', 'surface', 'elev', 'line']) {
+      if (bg === 'line' && fg !== 'text' && fg !== 'text2' && fg !== 'accent') continue;
+      out.push({ id, mode, pair: fg + '/' + bg, min: 4.5, r: ratio(t[fg], t[bg]) });
+    }
+    out.push({ id, mode, pair: 'onAccent/accent', min: 4.5, r: ratio(t.onAccent, t.accent) });
+    for (const bg of ['surface', 'elev']) out.push({ id, mode, pair: 'ctl/' + bg, min: 3, r: ratio(t.ctl, t[bg]) });
+  }
+  return out;
+}
+
+/* Figur aus Ebenen: Haar hinten, Beine, Körper, Kopf, Gesicht, Haar vorn, Arme, Gegenstand, Hände. */
+const GEO = {
+  line: { head: [100, 74, 42], torso: 'M60 192C58 140 72 114 100 114C128 114 142 140 140 192Z', legs: [[73, 186, 22, 34], [105, 186, 22, 34]], shoes: [[83, 222, 15, 7], [117, 222, 15, 7]], arms: ['M68 136C58 150 64 166 84 166', 'M132 136C142 150 136 166 116 166'], armW: 18, hands: [[84, 166, 8], [116, 166, 8]] },
+  flat: { head: [100, 58, 29], torso: 'M64 198L78 100C80 88 120 88 122 100L136 198C120 207 80 207 64 198Z', legs: [[83, 198, 12, 26], [105, 198, 12, 26]], shoes: [[89, 226, 12, 5], [111, 226, 12, 5]], arms: ['M84 104C68 122 72 144 90 150', 'M116 104C132 122 128 144 110 150'], armW: 12, hands: [[90, 150, 6], [110, 150, 6]] },
+  puffy: { head: [100, 84, 56], torso: 'M56 204C50 150 70 130 100 130C130 130 150 150 144 204C140 222 60 222 56 204Z', legs: [], shoes: [[76, 222, 19, 10], [124, 222, 19, 10]], arms: ['M66 156C54 170 64 176 82 170', 'M134 156C146 170 136 176 118 170'], armW: 18, hands: [[82, 170, 9], [118, 170, 9]] },
+};
+const HAIR = [
+  { front: 'M-46 4C-50-62 50-62 46 4C36-14 18-20 0-18C-18-20-36-14-46 4Z' },
+  { back: 'M-50-4C-54-66 54-66 50-4L53 34C53 46 36 46 34 34L-34 34C-36 46-53 46-53 34Z', front: 'M-45-2C-44-54 44-54 45-6C30-26 6-27-12-22C-24-18-36-13-45-2Z' },
+  { bun: [0, -56, 16], front: 'M-46 4C-50-62 50-62 46 4C38-20 20-24 2-24C-18-24-38-20-46 4Z' },
+];
+function item(kind, d, t) {
+  if (kind === 'line') return `<g><path class="ink" d="M117 152c10-2 13 13-1 15" fill="none" stroke-width="4"/><rect class="ink" x="82" y="143" width="36" height="31" rx="7" fill="#F4F1E3" stroke-width="4"/><path d="M84 152h32" stroke="#C8543A" stroke-width="4"/><path class="ink" d="M94 134c-3-4 3-6 0-10M106 134c-3-4 3-6 0-10" fill="none" stroke-width="3" stroke-linecap="round" opacity=".5"/></g>`;
+  if (kind === 'flat') return `<g><path d="M100 136C86 128 84 112 86 102C96 106 102 120 100 136Z" fill="#6E8F6B"/><path d="M100 136C114 128 118 110 114 98C104 104 98 120 100 136Z" fill="#577A58"/><path d="M85 134H115L111 164H89Z" fill="#E3B25C"/><path d="M83 130H117V138H83Z" fill="#C99A47"/></g>`;
+  return `<g><path d="M86 160V150C86 136 114 136 114 150V160" fill="none" stroke="#14857F" stroke-width="5"/><path d="M116 164L128 134" stroke="#E8A25A" stroke-width="10" stroke-linecap="round"/><path d="M84 164L78 138" stroke="#F0C66E" stroke-width="12" stroke-linecap="round"/><rect x="70" y="158" width="60" height="44" rx="12" fill="#1C9A93"/><circle cx="100" cy="180" r="6" fill="#FFF0EA"/></g>`;
+}
+function figure(d, look, label) {
+  const g = GEO[d.fig], t = currentTokens();
+  const [cx, cy, r] = g.head, k = r / 44;
+  const lined = d.fig === 'line';
+  const sw = 4.5;
+  const ol = (w = sw) => lined ? `class="ink" stroke-width="${w}" stroke-linejoin="round"` : '';
+  const h = HAIR[look.style];
+  const hairAt = (inner) => `<g transform="translate(${cx} ${cy}) scale(${k})">${inner}</g>`;
+  const hairAttr = lined ? `class="ink" stroke-width="${sw / k}" stroke-linejoin="round"` : '';
+  const back = h.back ? hairAt(`<path d="${h.back}" fill="${look.hair}" ${hairAttr}/>`) : '';
+  const bun = h.bun ? hairAt(`<circle cx="${h.bun[0]}" cy="${h.bun[1]}" r="${h.bun[2]}" fill="${look.hair}" ${hairAttr}/>`) : '';
+  const legs = g.legs.map(l => `<rect x="${l[0]}" y="${l[1]}" width="${l[2]}" height="${l[3]}" rx="${l[2] / 2}" fill="${d.trousers}" ${ol()}/>`).join('');
+  const shoes = g.shoes.map(s => `<ellipse cx="${s[0]}" cy="${s[1]}" rx="${s[2]}" ry="${s[3]}" fill="${d.fig === 'puffy' ? d.top2 : d.trousers}" ${ol()}/>`).join('');
+  const arm = p => (lined ? `<path class="ink" d="${p}" fill="none" stroke-width="${g.armW + sw * 2}" stroke-linecap="round"/>` : '') + `<path d="${p}" fill="none" stroke="${d.top}" stroke-width="${g.armW}" stroke-linecap="round"/>`;
+  const hands = g.hands.map(n => `<circle cx="${n[0]}" cy="${n[1]}" r="${n[2]}" fill="${look.skin}" ${ol()}/>`).join('');
+  const face = {
+    line: `<g class="eyes"><circle cx="${cx - 15}" cy="${cy + 6}" r="3.6" fill="#26302A"/><circle cx="${cx + 15}" cy="${cy + 6}" r="3.6" fill="#26302A"/></g><ellipse cx="${cx - 25}" cy="${cy + 15}" rx="6.5" ry="3.8" fill="#D9694F" opacity=".35"/><ellipse cx="${cx + 25}" cy="${cy + 15}" rx="6.5" ry="3.8" fill="#D9694F" opacity=".35"/><path d="M${cx - 5} ${cy + 16}Q${cx} ${cy + 21} ${cx + 5} ${cy + 16}" fill="none" stroke="#26302A" stroke-width="3" stroke-linecap="round"/>`,
+    flat: `<g class="eyes"><ellipse cx="${cx - 10}" cy="${cy + 3}" rx="2" ry="3" fill="#25233A"/><ellipse cx="${cx + 10}" cy="${cy + 3}" rx="2" ry="3" fill="#25233A"/></g><ellipse cx="${cx - 17}" cy="${cy + 11}" rx="4.5" ry="2.6" fill="#A25C76" opacity=".3"/><ellipse cx="${cx + 17}" cy="${cy + 11}" rx="4.5" ry="2.6" fill="#A25C76" opacity=".3"/><path d="M${cx - 3.5} ${cy + 12}Q${cx} ${cy + 15} ${cx + 3.5} ${cy + 12}" fill="none" stroke="#25233A" stroke-width="1.8" stroke-linecap="round"/>`,
+    puffy: `<g class="eyes"><ellipse cx="${cx - 24}" cy="${cy + 10}" rx="8.5" ry="10" fill="#3F1F33"/><ellipse cx="${cx + 24}" cy="${cy + 10}" rx="8.5" ry="10" fill="#3F1F33"/><circle cx="${cx - 21}" cy="${cy + 6}" r="3" fill="#fff"/><circle cx="${cx + 27}" cy="${cy + 6}" r="3" fill="#fff"/></g><ellipse cx="${cx - 39}" cy="${cy + 25}" rx="11" ry="6.5" fill="#F0668E" opacity=".5"/><ellipse cx="${cx + 39}" cy="${cy + 25}" rx="11" ry="6.5" fill="#F0668E" opacity=".5"/><path d="M${cx - 6} ${cy + 26}Q${cx} ${cy + 33} ${cx + 6} ${cy + 26}" fill="none" stroke="#3F1F33" stroke-width="3.5" stroke-linecap="round"/>`,
+  }[d.fig];
+  const belly = d.fig === 'flat' ? '<path d="M100 92V203" stroke="#000" stroke-opacity=".13" stroke-width="2"/>' : '';
+  return `<svg viewBox="0 0 200 240" role="img" aria-label="${label}"><g class="breath">
+    ${bun}${back}${legs}${shoes}
+    <path d="${g.torso}" fill="${d.top}" ${ol()}/>${belly}
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${look.skin}" ${ol()}/>
+    ${face}
+    ${hairAt(`<path d="${h.front}" fill="${look.hair}" ${hairAttr}/>`)}
+    ${g.arms.map(arm).join('')}
+    ${item(d.fig, d, t)}
+    ${hands}
+  </g></svg>`;
+}
+
+/* Bereiche */
+function renderHome() {
+  const d = DIRECTIONS[state.dir];
+  const hour = new Date().getHours();
+  const hi = hour < 11 ? 'Guten Morgen' : hour < 18 ? 'Hallo' : 'Guten Abend';
+  const open = items.filter(i => !i.done).length;
+  $('view-home').innerHTML = `
+    <h1>${hi}, Mika</h1>
+    <div class="stage">
+      <button class="fig" data-who="mika" aria-label="Frisur und Hautton von Mika wechseln">${figure(d, LOOKS[PEOPLE.mika.look], 'Figur Mika')}</button>
+      <button class="fig" data-who="juno" aria-label="Frisur und Hautton von Juno wechseln">${figure(d, LOOKS[PEOPLE.juno.look], 'Figur Juno')}</button>
+    </div>
+    <p class="small muted hint">Tippe eine Figur an. Frisur und Hautton sind eigene Ebenen.</p>
+    <div class="card">
+      <h2>Heute</h2>
+      <div class="trace">
+        <p>Juno hat Hafermilch gekauft.</p>
+        <button class="btn ${state.thanked ? 'quiet' : ''}" id="thanks">${state.thanked ? 'Gesagt' : 'Danke sagen'}</button>
+      </div>
+      <p class="muted">${open === 0 ? 'Die Einkaufsliste ist leer.' : open === 1 ? 'Noch ein Ding auf der Liste.' : `Noch ${open} Dinge auf der Liste. Oder morgen.`}</p>
+    </div>`;
+}
+function renderList() {
+  const groups = [...new Set(items.map(i => i.group))];
+  $('view-list').innerHTML = `
+    <div class="screen-head"><h1>Einkauf</h1><button class="add" id="addBtn" aria-label="Eintrag hinzufügen">${svg('plus')}</button></div>
+    ${groups.map(g => `<div><h3>${g}</h3><ul class="group">${items.map((it, i) => it.group !== g ? '' : `
+      <li><button class="row" data-i="${i}" aria-pressed="${it.done}">
+        <span class="tick">${svg('check')}</span>
+        <span class="name">${esc(it.name)}</span>
+        ${it.qty ? `<span class="qty">${esc(it.qty)}</span>` : ''}
+      </button></li>`).join('')}</ul></div>`).join('')}
+    <p class="small muted">Abhaken wirkt sofort, ohne Feier. Neue Einträge landen unter Vorrat.</p>`;
+}
+function renderStyle() {
+  const d = DIRECTIONS[state.dir], t = currentTokens(), r = d.radius;
+  const fails = audit().filter(a => a.id === state.dir && a.r < a.min);
+  const sw = [
+    ['Grund', t.bg, null], ['Fläche', t.surface, null], ['Akzent', t.accent, t.bg], ['Zweite Farbe', t.second, t.bg],
+    ['Text', t.text, t.bg], ['Text 2', t.text2, t.bg], ['Text 3', t.text3, t.bg], ['Lampe, nur Deko', t.sun, null],
+  ];
+  $('view-style').innerHTML = `
+    <h1>${d.title}</h1>
+    <div class="card"><p>${d.mood}</p>
+      <dl class="pair"><dt>Stärke</dt><dd>${d.plus}</dd><dt>Risiko</dt><dd>${d.minus}</dd></dl>
+      <button class="btn ${state.fav === state.dir ? 'quiet' : ''}" id="favBtn">${state.fav === state.dir ? 'Dein Favorit, nochmal tippen zum Entfernen' : 'Als Favorit merken'}</button>
+      <p class="small muted">${state.fav ? `Favorit: ${DIRECTIONS[state.fav].title}. ` : ''}Der Favorit bleibt nur auf diesem Gerät. Deine Wahl nennst du Claude in der Session.</p>
+    </div>
+    <div class="card"><h2>Farben</h2>
+      <div class="swatches">${sw.map(([n, c, on]) => `<div class="swatch"><div class="chip" style="background:${c}"></div><b>${n}</b><span>${c}${on ? ` · ${fmt(ratio(c, on))}:1 auf Grund` : ''}</span></div>`).join('')}</div>
+      <p class="small muted">${fails.length ? `${fails.length} Paare unter dem Mindestwert.` : 'Alle Text-Paare dieser Richtung erreichen in Hell und Dunkel mindestens 4,5:1, Ränder von Bedienelementen 3:1. Die Seite rechnet das selbst nach.'}</p>
+    </div>
+    <div class="card"><h2>Rundungen</h2>
+      <div class="radii">
+        <div class="radius"><i style="border-radius:${r.card}px"></i><span>Karte ${r.card}</span></div>
+        <div class="radius"><i style="border-radius:${r.inner}px"></i><span>Innen ${r.inner}</span></div>
+        <div class="radius"><i style="border-radius:${r.btn === 999 ? '999px' : r.btn + 'px'}"></i><span>Knopf ${r.btn === 999 ? 'Kapsel' : r.btn}</span></div>
+      </div>
+      <p class="small muted">Innen ist Karte minus Innenabstand ${r.card - r.inner}, wie bei Apples konzentrischen Ecken.</p>
+    </div>
+    <div class="card"><h2>Schrift</h2>
+      <div class="spec">
+        <span class="d1">Einkauf</span>
+        <span class="d2">Am Samstag zieht Juno ein</span>
+        <span>Tomaten, Basilikum und zwei Packungen Kaffee. Ändere die Textgröße in den iPhone-Einstellungen, dann wächst dieser Text mit.</span>
+        <span class="small muted">${d.fontNote}</span>
+        <span class="small muted">Android und Windows kennen ui-rounded und ui-serif nicht und zeigen hier eine Ersatzschrift. Die App liefert dafür später eine eigene Rundschrift aus. Beurteile die Schrift deshalb auf dem iPhone.</span>
+      </div>
+    </div>`;
+}
+function render() {
+  document.querySelectorAll('#seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.dir === state.dir));
+  document.querySelectorAll('#tabs button').forEach(b => { if (b.dataset.view === state.view) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  for (const v of Object.keys(VIEWS)) $('view-' + v).hidden = v !== state.view;
+  applyTokens();
+  ({ home: renderHome, list: renderList, style: renderStyle })[state.view]();
+  $('modeBtn').innerHTML = svg(isDark() ? 'sun' : 'moon');
+}
+
+$('seg').innerHTML = Object.entries(DIRECTIONS).map(([k, d]) => `<button data-dir="${k}">${d.name}</button>`).join('');
+$('tabs').innerHTML = Object.entries(VIEWS).map(([k, n]) => `<button class="tab" data-view="${k}">${`<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`}<span>${n}</span></button>`).join('');
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.dir) { state.dir = b.dataset.dir; render(); }
+  else if (b.dataset.view) { state.view = b.dataset.view; render(); scrollTo(0, 0); }
+  else if (b.dataset.i !== undefined) {
+    const it = items[+b.dataset.i];
+    it.done = !it.done;
+    b.setAttribute('aria-pressed', it.done);
+  }
+  else if (b.dataset.who) {
+    const p = PEOPLE[b.dataset.who];
+    p.look = (p.look + 1) % LOOKS.length;
+    renderHome();
+    const fig = document.querySelector(`[data-who="${b.dataset.who}"]`);
+    fig.classList.add('hop');
+    fig.focus({ preventScroll: true });
+  }
+  else if (b.id === 'thanks') { state.thanked = !state.thanked; renderHome(); }
+  else if (b.id === 'addBtn') openSheet();
+  else if (b.id === 'favBtn') {
+    state.fav = state.fav === state.dir ? null : state.dir;
+    try { if (state.fav) localStorage.setItem('haushalt-stil-favorit', state.fav); else localStorage.removeItem('haushalt-stil-favorit'); } catch (err) {}
+    renderStyle();
+  }
+});
+
+$('modeBtn').addEventListener('click', () => {
+  document.documentElement.dataset.theme = isDark() ? 'light' : 'dark';
+  render();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+
+/* Sheet */
+const sheet = $('sheet'), input = $('itemInput');
+function openSheet() {
+  state.large = false; sheet.classList.remove('large');
+  input.value = ''; $('doneBtn').disabled = true; $('confirm').hidden = true;
+  sheet.hidden = false; $('scrim').hidden = false;
+  input.focus();
+}
+function closeSheet() { sheet.hidden = true; $('scrim').hidden = true; sheet.style.transform = ''; }
+function tryClose() {
+  sheet.style.transform = '';
+  if (input.value.trim()) { $('confirm').hidden = false; return; }
+  closeSheet();
+}
+input.addEventListener('input', () => { $('doneBtn').disabled = !input.value.trim(); $('confirm').hidden = true; });
+input.addEventListener('keydown', e => { if (e.key === 'Enter' && input.value.trim()) $('doneBtn').click(); });
+$('doneBtn').addEventListener('click', () => {
+  items.push({ group: 'Vorrat', name: input.value.trim(), qty: '', done: false });
+  closeSheet(); renderList();
+});
+$('cancelBtn').addEventListener('click', closeSheet);
+$('discardBtn').addEventListener('click', closeSheet);
+$('keepBtn').addEventListener('click', () => { $('confirm').hidden = true; input.focus(); });
+$('scrim').addEventListener('click', tryClose);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) tryClose(); });
+let drag = null;
+$('grab').addEventListener('pointerdown', e => { drag = { y: e.clientY, moved: 0 }; $('grab').setPointerCapture(e.pointerId); sheet.style.transition = 'none'; });
+$('grab').addEventListener('pointermove', e => {
+  if (!drag) return;
+  drag.moved = e.clientY - drag.y;
+  if (drag.moved > 0) sheet.style.transform = `translateY(${drag.moved}px)`;
+});
+$('grab').addEventListener('pointerup', () => {
+  if (!drag) return;
+  const m = drag.moved; drag = null;
+  sheet.style.transition = '';
+  if (m > 70) tryClose();
+  else if (m < -40) { state.large = true; sheet.classList.add('large'); sheet.style.transform = ''; }
+  else if (Math.abs(m) < 6) { state.large = !state.large; sheet.classList.toggle('large', state.large); sheet.style.transform = ''; }
+  else sheet.style.transform = '';
+});
+
+window.auditContrast = () => audit().filter(a => a.r < a.min).map(a => `${a.id} ${a.mode} ${a.pair} ${a.r.toFixed(2)}`);
+render();
+</script>
