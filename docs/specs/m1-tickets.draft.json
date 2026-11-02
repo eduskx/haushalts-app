@@ -1,0 +1,337 @@
+{
+  "tickets": [
+    {
+      "id": "m1-01",
+      "title": "Monorepo-Gerüst mit pnpm, Turborepo und strengem TypeScript",
+      "module": "packages/kit/config",
+      "goal": "Ein leeres Workspace-Gerüst, in dem jedes spätere Paket Typprüfung, Lint und Tests über einen Befehl bekommt.",
+      "criteria": [
+        "`pnpm install --frozen-lockfile` läuft auf einem frischen Checkout ohne Fehler.",
+        "`pnpm typecheck` läuft über alle Pakete und schlägt bei einem absichtlichen Typfehler in `packages/kit/core` fehl.",
+        "Die Workspaces `apps/*`, `packages/kit/*` und `packages/features/*` sind in `pnpm-workspace.yaml` eingetragen.",
+        "`packages/kit/config` enthält je ein Preset für tsconfig (strict), ESLint und Tailwind, und `packages/kit/core` nutzt es.",
+        "Ein Beispieltest in `packages/kit/core` läuft über `pnpm test`."
+      ],
+      "labels": [],
+      "dependsOn": [],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-02",
+      "title": "Modulregeln als Check: Importgrenzen, tote Exporte, gesperrte Wörter",
+      "module": "packages/kit/config",
+      "goal": "Die Regeln aus docs/module-contract.md prüft eine Maschine in `pnpm check`.",
+      "criteria": [
+        "`.dependency-cruiser.cjs` bildet die Tabelle „Darf importieren“ aus docs/module-contract.md ab.",
+        "Ein Import von `packages/kit/*` nach `packages/features/*` lässt `pnpm check` fehlschlagen (durch Test belegt).",
+        "Ein Import von `packages/` nach `apps/` lässt `pnpm check` fehlschlagen.",
+        "Das Wort „partner“ in einer Datei unter `packages/` lässt `pnpm check` fehlschlagen; dieselbe Datei unter `apps/web` besteht.",
+        "`knip.json` meldet einen ungenutzten Export als Fehler.",
+        "`pnpm check` führt typecheck, lint, test, dependency-cruiser, knip und die Wortprüfung aus."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-01"
+      ],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-03",
+      "title": "CI-Workflow führt `pnpm check` bei jedem PR aus",
+      "module": ".github",
+      "goal": "Kein PR wird ohne grünen Check mergebar.",
+      "criteria": [
+        "`.github/workflows/ci.yml` läuft bei `pull_request` und bei Push auf den Default-Branch.",
+        "Der Workflow nutzt Node, pnpm und den Cache aus dem Lockfile und ruft `pnpm check` auf.",
+        "Ein PR mit absichtlichem Typfehler zeigt einen roten Check, derselbe PR ohne Fehler einen grünen.",
+        "Der Workflow enthält keine Secrets."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-02"
+      ],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-04",
+      "title": "App-Hülle apps/web mit Vite, React Router und Tailwind v4",
+      "module": "apps/web",
+      "goal": "Eine startbare, leere App, die die Tokens aus docs/design/tokens.css nutzt.",
+      "criteria": [
+        "`pnpm --filter web dev` startet die App und zeigt unter `/` eine Platzhalterseite.",
+        "`pnpm --filter web build` erzeugt einen statischen Build ohne Fehler und ohne Warnungen von TypeScript.",
+        "`apps/web` bindet `docs/design/tokens.css` ein, Tailwind-Klassen für Farbe und Abstand lesen die Token (kein fester Hex-Wert in den Komponenten).",
+        "Eine unbekannte Route zeigt eine Fehlerseite statt einer leeren Seite.",
+        "Alle sichtbaren Texte stehen in einer Sprachdatei, nicht im Komponentencode."
+      ],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-01"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-05",
+      "title": "Deployment-Vorschau auf Vercel für jeden PR",
+      "module": "apps/web",
+      "goal": "Jeder PR erhält eine HTTPS-Adresse, die man auf dem iPhone öffnen kann. Die Projekte legt Claude über die Connectoren an, nach Rückfrage; Zugangsdaten gehen nie ins Repo.",
+      "criteria": [
+        "Ein PR erzeugt eine Vorschau-URL, die `/` ausliefert.",
+        "Die URL ist per HTTPS erreichbar (Voraussetzung für PWA und Service Worker).",
+        "Im Repo liegen keine Vercel-Tokens oder andere Secrets.",
+        "Unbekannte Pfade wie `/foo` liefern `index.html` (SPA-Fallback)."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-04"
+      ],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-06",
+      "title": "PWA: Manifest, Icons und Service Worker für Vollbild auf dem Homescreen",
+      "module": "apps/web",
+      "goal": "Die App lässt sich auf dem iPhone installieren und öffnet ohne Safari-Leiste.",
+      "criteria": [
+        "Das Manifest setzt `display: standalone`, `name`, `short_name`, `theme_color`, `background_color` und `start_url`.",
+        "Es gibt PNG-Icons in 180, 192 und 512 px sowie ein maskierbares Icon, und das `apple-touch-icon` ist im HTML verlinkt.",
+        "Lighthouse (PWA-Kriterium „installierbar“) meldet keine Manifest-Fehler im Preview-Build.",
+        "Ein Service Worker wird registriert und liefert die App-Hülle offline aus (Playwright-Test: Netz aus, Neuladen, Platzhalterseite sichtbar).",
+        "Name und Icons liegen nur in `apps/web`, nicht in `packages/`."
+      ],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-05"
+      ],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-07",
+      "title": "Installationsanleitung für Safari auf dem iPhone",
+      "module": "apps/web",
+      "goal": "Wer die App im Safari-Tab öffnet, bekommt erklärt, wie er sie zum Homescreen hinzufügt.",
+      "criteria": [
+        "Auf iOS-Safari außerhalb des Standalone-Modus erscheint beim ersten Start eine Anleitung mit den Schritten „Teilen“ und „Zum Home-Bildschirm“.",
+        "Im Standalone-Modus (`display-mode: standalone` oder `navigator.standalone`) erscheint sie nie.",
+        "Auf Desktop-Chrome und Android erscheint sie nicht.",
+        "„Verstanden“ blendet sie aus, und sie kommt nach Neuladen nicht wieder (Flag in localStorage; fehlt localStorage, erscheint sie bei jedem Start, ohne Fehler).",
+        "Die Texte stehen in der Sprachdatei, die Erkennung ist eine reine Funktion mit Unit-Tests für mindestens vier User-Agents."
+      ],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-06"
+      ],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-08",
+      "title": "Lokale Supabase-Umgebung und pgTAP-Harness",
+      "module": "apps/web",
+      "goal": "Datenbank, Migrationen und Datenbanktests laufen lokal und in CI. Die Projekte legt Claude über die Connectoren an, nach Rückfrage; Zugangsdaten gehen nie ins Repo.",
+      "criteria": [
+        "`pnpm db:start` startet Supabase lokal, `pnpm db:test` führt pgTAP-Tests aus.",
+        "Ein Beispieltest besteht, ein absichtlich falscher Test lässt `pnpm db:test` fehlschlagen.",
+        "`pnpm db:install-modules` kopiert Migrationsdateien aus `packages/kit/*/migrations/` nach `apps/web/supabase/migrations/`, mit Zeitstempel im Dateinamen, und kopiert bereits kopierte Dateien nicht erneut.",
+        "Ändert sich eine bereits kopierte Migration, schlägt der Hash-Vergleich in `pnpm check` fehl.",
+        "Im Repo liegen nur URL und Anon-Key als Beispielwerte in `.env.example`, kein Service-Key."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-03"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-09",
+      "title": "RLS-Katalogtest: jede öffentliche Tabelle braucht RLS, Policies und Fremdgruppen-Test",
+      "module": "packages/kit/core",
+      "goal": "Eine Tabelle ohne Zugriffsschutz bricht die CI, bevor sie in main landet.",
+      "criteria": [
+        "Der Test fragt `pg_class` und `pg_policies` ab und schlägt fehl, wenn eine Tabelle im Schema `public` RLS nicht aktiviert hat.",
+        "Er schlägt fehl, wenn eine Tabelle mit RLS keine Policy hat.",
+        "Er schlägt fehl, wenn für eine Tabelle keine pgTAP-Datei existiert, die sie gegen eine fremde Gruppe prüft.",
+        "Eine Fixture-Tabelle ohne RLS belegt jeden der drei Fehlerfälle.",
+        "Der Test läuft in `pnpm db:test` und damit in CI."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-08"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-10",
+      "title": "Tabelle für Registrierungscodes mit RLS und pgTAP-Test",
+      "module": "packages/kit/auth",
+      "goal": "Registrierungscodes liegen in der Datenbank, und kein Client kann sie lesen oder erzeugen.",
+      "criteria": [
+        "Die Migration legt `signup_codes` an (Code als Hash, `used_at`, `used_by`, `expires_at`) mit aktivierter RLS.",
+        "Ein pgTAP-Test zeigt: Rolle `anon` und eine eingeloggte Rolle können weder lesen noch einfügen noch ändern.",
+        "Der Klartext-Code wird nirgends gespeichert, nur sein Hash.",
+        "Die Migration liegt als nummerierte Datei in `packages/kit/auth/migrations/` und besteht den Katalogtest.",
+        "Eine Anleitung in `docs/` zeigt, wie Codes per SQL im Dashboard angelegt werden (Hash berechnen, `expires_at` setzen), ohne dass ein Klartext-Code im Repo steht."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-09"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-11",
+      "title": "Registrierung per Code: atomare Einlösung und Konto anlegen",
+      "module": "packages/kit/auth",
+      "goal": "Nur wer einen gültigen, unverbrauchten Code hat, bekommt ein Konto, und jeder Code gilt genau einmal.",
+      "criteria": [
+        "Ein gültiger Code mit E-Mail und Passwort erzeugt ein Konto und markiert den Code als verbraucht.",
+        "Ein unbekannter, abgelaufener oder verbrauchter Code erzeugt kein Konto und liefert dieselbe, nicht unterscheidbare Fehlermeldung.",
+        "Zwei gleichzeitige Aufrufe mit demselben Code erzeugen genau ein Konto (Test mit parallelen Aufrufen).",
+        "Nach fünf falschen Codes pro Minute und Client wird weiter abgewiesen (Rate Limit), auch mit einem später gültigen Code.",
+        "Der Service-Key wird nur serverseitig in der Edge Function genutzt und kommt nie in den Client-Bundle (Test sucht im Build nach dem Wert).",
+        "Die E-Mail-Bestätigung ist in der Supabase-Konfiguration ausgeschaltet; ein Passwort-Reset gibt es in M1 nicht."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-10"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-12",
+      "title": "Supabase-Client, Auth-Provider und Session-Persistenz",
+      "module": "packages/kit/auth",
+      "goal": "Eine Session überlebt das Schließen und Neustarten der App.",
+      "criteria": [
+        "Der Client nutzt ausschließlich URL und Anon-Key aus der Umgebung.",
+        "Nach Login und Neuladen der Seite bleibt die Nutzerin eingeloggt (Playwright).",
+        "Nach Schließen und Neu-Öffnen des Browser-Kontexts mit gespeichertem Zustand bleibt sie eingeloggt.",
+        "Ein abgelaufenes Access-Token wird mit dem Refresh-Token erneuert, ohne dass die Nutzerin etwas merkt.",
+        "Ist der Speicher nicht verfügbar, landet die App auf der Login-Seite statt in einem Fehler."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-04",
+        "m1-08"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-13",
+      "title": "Login- und Registrierungsseiten mit geschützten Routen",
+      "module": "apps/web",
+      "goal": "Man kann sich per Einladungscode registrieren, einloggen und ausloggen, und geschützte Seiten sind ohne Login nicht erreichbar.",
+      "criteria": [
+        "`/login` und `/register` existieren, `/register` hat ein Feld für den Einladungscode.",
+        "Ohne Session leitet jede andere Route auf `/login` um und merkt sich das Ziel.",
+        "Falsche Zugangsdaten zeigen eine Fehlermeldung, ohne zu verraten, ob die E-Mail existiert.",
+        "Ein Passwort unter 8 Zeichen wird vor dem Absenden abgewiesen.",
+        "Logout löscht die Session, und die Zurück-Taste führt nicht in eine geschützte Seite.",
+        "Alle Texte stehen in der Sprachdatei, Eingabefelder haben Labels und passende `autocomplete`-Werte."
+      ],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-11",
+        "m1-12"
+      ],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-14",
+      "title": "Update-Hinweis bei neuer App-Version",
+      "module": "packages/kit/core",
+      "goal": "Eine laufende App merkt eine neue Version und bietet das Neuladen an.",
+      "criteria": [
+        "Der Build schreibt eine Versionskennung in die App und in eine abrufbare Datei `version.json`.",
+        "Wird eine neue Version bereitgestellt, erscheint in der geöffneten App ein Hinweis mit Knopf „Aktualisieren“.",
+        "Der Knopf aktiviert den neuen Service Worker und lädt neu; danach zeigt die App die neue Versionskennung.",
+        "Ohne neue Version erscheint kein Hinweis (Playwright mit zwei Builds).",
+        "Der Hinweis unterbricht keine laufende Eingabe, er erscheint als Leiste."
+      ],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-06"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-15",
+      "title": "Mindestversion: veraltete Clients werden zum Update gezwungen",
+      "module": "packages/kit/core",
+      "goal": "Ein Client unter der Mindestversion kann nichts mehr tun außer sich zu aktualisieren.",
+      "criteria": [
+        "Eine Tabelle oder Konfiguration `min_client_version` ist öffentlich lesbar und von Clients nicht schreibbar (pgTAP).",
+        "Liegt die Version des Clients unter der Mindestversion, zeigt die App einen Vollbild-Hinweis mit Update-Knopf, und der Rest der App ist nicht bedienbar.",
+        "Liegt sie gleich oder darüber, erscheint kein Hinweis.",
+        "Die Versionsvergleichsfunktion hat Unit-Tests für gleiche, kleinere, größere und ungültige Versionen; eine ungültige Version sperrt nicht.",
+        "Ist die Abfrage offline nicht möglich, bleibt die App benutzbar."
+      ],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-14",
+        "m1-09"
+      ],
+      "needsHuman": false
+    },
+    {
+      "id": "m1-16",
+      "title": "E2E-Grundgerüst mit Playwright (Chromium und WebKit)",
+      "module": "apps/web",
+      "goal": "Die Abnahme-Kriterien von M1 laufen als automatische Tests in CI.",
+      "criteria": [
+        "`pnpm e2e` startet die App und die lokale Datenbank und führt die Tests aus.",
+        "Es gibt je einen Test für: Registrierung mit gültigem Code, Abweisung eines verbrauchten Codes, Login, Session nach Neuladen, Update-Hinweis.",
+        "Die Tests laufen in Chromium und WebKit.",
+        "CI führt `pnpm e2e` aus und lädt bei Fehlern den Trace hoch.",
+        "Die README bzw. docs nennen, dass WebKit kein iOS-Safari ersetzt (ADR 0002)."
+      ],
+      "labels": [],
+      "dependsOn": [
+        "m1-13",
+        "m1-15"
+      ],
+      "needsHuman": true
+    },
+    {
+      "id": "m1-17",
+      "title": "Handtest M1 auf dem iPhone und Abnahme",
+      "module": "apps/web",
+      "goal": "Du bestätigst die drei Bedingungen von M1 auf einem echten iPhone.",
+      "criteria": [
+        "Installation über Safari auf den Homescreen funktioniert, die App öffnet ohne Safari-Leiste.",
+        "Die Anleitung erscheint im Safari-Tab und nicht in der installierten App.",
+        "Registrierung mit Code, Einloggen, App-Neustart (aus dem App-Umschalter wischen): Session ist noch da.",
+        "Eine neue Version zeigt den Hinweis, und eine angehobene Mindestversion sperrt die App.",
+        "Ergebnis steht als Kommentar am Ticket."
+      ],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-16"
+      ],
+      "needsHuman": true
+    }
+  ],
+  "openQuestions": [
+    "Geschützte Pfade (m1-01 bis m1-03): Die Regel in CLAUDE.md bleibt bestehen. Die Tickets bleiben `needsHuman`; der Agent baut alles, du gibst nur die Änderung an geschützten Pfaden im PR frei. Das ist ein Klick am Handy.",
+    "App-Name für Manifest und Icons (m1-06): Platzhalter, Umbenennen bis M8."
+  ],
+  "resolved": {
+    "signupCodes": "Per SQL im Dashboard, keine Admin-Oberfläche.",
+    "email": "Bestätigung aus, kein Passwort-Reset in M1.",
+    "accounts": "Claude legt Supabase- und Vercel-Projekt über die Connectoren an, nach Rückfrage.",
+    "minVersion": "Datenbank-Tabelle (Standard, nicht gefragt)."
+  }
+}
