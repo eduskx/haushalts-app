@@ -1,0 +1,61 @@
+{
+  "$schema": "./workflow-kit/schemas/project-config.schema.json",
+  "project": {
+    "name": "haushalts-app",
+    "language": "de"
+  },
+  "tracker": {
+    "adapter": "github",
+    "repo": "eduskx/haushalts-app",
+    "allowedAuthors": ["eduskx"],
+    "labels": {
+      "ready": "ready",
+      "inProgress": "in-progress",
+      "inReview": "in-review",
+      "needsHuman": "needs-human",
+      "ui": "ui"
+    }
+  },
+  "commands": {
+    "install": "pnpm install --frozen-lockfile",
+    "check": "pnpm check",
+    "e2e": "pnpm e2e",
+    "preview": "pnpm preview"
+  },
+  "models": {
+    "planner": { "model": "opus", "fallback": "sonnet" },
+    "implementer": { "model": "sonnet" },
+    "reviewer": { "model": "sonnet" },
+    "tester": { "model": "sonnet" },
+    "auditor": { "model": "opus", "fallback": "sonnet" }
+  },
+  "limits": {
+    "maxDiffLines": 300,
+    "maxFixRounds": 2,
+    "auditEveryMerges": 10,
+    "minClaudeCodeVersion": "2.1.209"
+  },
+  "protectedPaths": [
+    ".github/",
+    "workflow-kit/",
+    "project.config.json",
+    "CLAUDE.md",
+    "docs/adr/",
+    "docs/design/hig-checklist.md",
+    ".dependency-cruiser.cjs",
+    "knip.json",
+    "packages/kit/config/"
+  ],
+  "destructiveSql": ["\\bdrop\\s+(table|column|schema)\\b", "\\btruncate\\b", "\\bdisable\\s+row\\s+level\\s+security\\b", "\\bdelete\\s+from\\b(?![\\s\\S]*\\bwhere\\b)"],
+  "forbiddenTerms": {
+    "paths": ["packages/"],
+    "terms": ["couple", "partner", "paar", "freundin", "boyfriend", "girlfriend"]
+  },
+  "docs": {
+    "spec": "docs/specs/v1.md",
+    "moduleContract": "docs/module-contract.md",
+    "adrDir": "docs/adr/",
+    "hig": "docs/design/hig-checklist.md",
+    "goldenExample": "packages/features/lists"
+  }
+}

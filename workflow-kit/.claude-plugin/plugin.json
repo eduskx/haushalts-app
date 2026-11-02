@@ -1,0 +1,6 @@
+{
+  "name": "workflow-kit",
+  "version": "0.1.0",
+  "author": { "name": "eduskx" },
+  "description": "Reusable agent pipeline: planner, implementer, reviewer, tester and auditor, driven by a deterministic orchestrator and configured per project."
+}
