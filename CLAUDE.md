@@ -32,6 +32,14 @@ docs            Spec, ADRs, Design, Modul-Vertrag
 
 Stand: Phase 0, noch kein App-Code. Der Spec-Entwurf liegt in [docs/specs/v1.md](docs/specs/v1.md).
 
+## Nebenbei Erwähntes
+
+Erwähnt der Nutzer nebenbei eine Feature-Idee oder wie wir etwas machen sollen, halte es sofort nach dem Skill `workflow-kit:capture-idea` fest, auch ungefragt und mitten in anderer Arbeit. Ideen werden Tickets in Linear mit dem Label `idea`. Hinweise zur Arbeitsweise ändern den Workflow selbst.
+
+## Tickets
+
+Tickets liegen in Linear, im Projekt `haushalts-app`. Lege keine GitHub-Issues an, siehe [ADR 0006](docs/adr/0006-linear-als-tracker.md). GitHub ist nur für Code und PRs da.
+
 ## Sprache
 
 Code, Bezeichner und Code-Kommentare auf Englisch. Oberfläche, Tickets, PRs und ADRs auf Deutsch. Oberflächentexte liegen immer in den Sprachdateien des Moduls, nie direkt im Code.

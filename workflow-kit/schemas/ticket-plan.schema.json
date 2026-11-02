@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "TicketPlan",
-  "description": "Returned by the planner and auditor. The orchestrator turns it into tracker issues.",
+  "description": "Returned by the planner and auditor. The orchestrator turns it into tracker tickets.",
   "type": "object",
   "additionalProperties": false,
   "required": ["tickets", "openQuestions"],

@@ -2,15 +2,22 @@
   "$schema": "./workflow-kit/schemas/project-config.schema.json",
   "project": {
     "name": "haushalts-app",
-    "language": "de"
+    "language": "de",
+    "repo": "eduskx/haushalts-app"
   },
   "tracker": {
-    "adapter": "github",
-    "repo": "eduskx/haushalts-app",
-    "allowedAuthors": ["eduskx"],
+    "adapter": "linear",
+    "team": "EDU",
+    "project": "haushalts-app",
+    "allowedAuthors": ["1b4d96b5-95bb-4622-89e3-161a18e0d876"],
+    "statuses": {
+      "idea": "Backlog",
+      "ready": "Todo",
+      "inProgress": "In Progress",
+      "done": "Done"
+    },
     "labels": {
-      "ready": "ready",
-      "inProgress": "in-progress",
+      "idea": "idea",
       "inReview": "in-review",
       "needsHuman": "needs-human",
       "ui": "ui"
