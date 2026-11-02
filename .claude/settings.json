@@ -8,7 +8,6 @@
       "mcp__Linear__list_milestones",
       "mcp__Linear__whoami",
       "mcp__Linear__save_comment",
-      "mcp__Linear__delete_comment",
       "mcp__Linear__save_project"
     ]
   }
