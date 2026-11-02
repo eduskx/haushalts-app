@@ -9,6 +9,7 @@
     "repo": "eduskx/haushalts-app",
     "allowedAuthors": ["eduskx"],
     "labels": {
+      "idea": "idea",
       "ready": "ready",
       "inProgress": "in-progress",
       "inReview": "in-review",

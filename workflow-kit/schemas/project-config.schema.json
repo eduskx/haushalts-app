@@ -32,8 +32,9 @@
         "labels": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["ready", "inProgress", "inReview", "needsHuman", "ui"],
+          "required": ["idea", "ready", "inProgress", "inReview", "needsHuman", "ui"],
           "properties": {
+            "idea": { "type": "string", "description": "Captured but not planned. Never picked up by the pipeline." },
             "ready": { "type": "string" },
             "inProgress": { "type": "string" },
             "inReview": { "type": "string" },

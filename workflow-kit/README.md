@@ -7,7 +7,7 @@ A reusable agent pipeline for Claude Code. Everything project-specific lives in 
 | Path | Purpose | State |
 |---|---|---|
 | `agents/` | planner, implementer, reviewer, tester, auditor | ready |
-| `skills/` | write-spec, split-tickets, module-contract, design-foundation, retro | ready |
+| `skills/` | write-spec, split-tickets, module-contract, design-foundation, retro, capture-idea | ready |
 | `hooks/` | Blocks dangerous commands and protected-path edits. Guards against accidents, not a security boundary | ready, tested |
 | `schemas/` | Config schema and the JSON the agents must return | ready |
 | `templates/` | CI, issue and PR templates, CLAUDE.md skeleton | ready |

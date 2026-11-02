@@ -32,6 +32,10 @@ docs            Spec, ADRs, Design, Modul-Vertrag
 
 Stand: Phase 0, noch kein App-Code. Der Spec-Entwurf liegt in [docs/specs/v1.md](docs/specs/v1.md).
 
+## Nebenbei Erwähntes
+
+Erwähnt der Nutzer nebenbei eine Feature-Idee oder wie wir etwas machen sollen, halte es sofort nach dem Skill `workflow-kit:capture-idea` fest, auch ungefragt und mitten in anderer Arbeit. Ideen werden Issues mit dem Label `idea`. Hinweise zur Arbeitsweise ändern den Workflow selbst.
+
 ## Sprache
 
 Code, Bezeichner und Code-Kommentare auf Englisch. Oberfläche, Tickets, PRs und ADRs auf Deutsch. Oberflächentexte liegen immer in den Sprachdateien des Moduls, nie direkt im Code.
