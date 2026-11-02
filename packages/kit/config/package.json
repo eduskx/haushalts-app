@@ -9,9 +9,9 @@
     "./tailwind.css": "./tailwind.css"
   },
   "scripts": {
-    "typecheck": "echo 'nothing to typecheck'",
-    "lint": "echo 'nothing to lint'",
-    "test": "vitest run --passWithNoTests"
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@eslint/js": "^9.30.0",
@@ -19,6 +19,8 @@
   },
   "devDependencies": {
     "eslint": "^9.30.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "typescript": "~5.9.0",
+    "@types/node": "^22.0.0"
   }
 }
