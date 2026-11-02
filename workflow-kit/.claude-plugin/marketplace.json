@@ -1,0 +1,12 @@
+{
+  "name": "workflow-kit-marketplace",
+  "description": "Reusable agent pipeline for Claude Code.",
+  "owner": { "name": "eduskx" },
+  "plugins": [
+    {
+      "name": "workflow-kit",
+      "source": "./",
+      "description": "Reusable agent pipeline configured through project.config.json."
+    }
+  ]
+}

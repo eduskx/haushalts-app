@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProjectConfig",
+  "description": "Everything about a project that the workflow kit needs to know.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["project", "tracker", "commands", "models", "limits", "protectedPaths", "docs"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "language"],
+      "properties": {
+        "name": { "type": "string" },
+        "language": { "type": "string", "description": "Language for tickets, pull requests and reports." }
+      }
+    },
+    "tracker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "repo", "allowedAuthors", "labels"],
+      "properties": {
+        "adapter": { "enum": ["github"] },
+        "repo": { "type": "string" },
+        "allowedAuthors": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Only text by these authors reaches agents."
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ready", "inProgress", "inReview", "needsHuman", "ui"],
+          "properties": {
+            "ready": { "type": "string" },
+            "inProgress": { "type": "string" },
+            "inReview": { "type": "string" },
+            "needsHuman": { "type": "string" },
+            "ui": { "type": "string" }
+          }
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "required": ["install", "check"]
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model"],
+        "properties": {
+          "model": { "type": "string" },
+          "fallback": { "type": "string" }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxDiffLines", "maxFixRounds"],
+      "properties": {
+        "maxDiffLines": { "type": "integer", "minimum": 1 },
+        "maxFixRounds": { "type": "integer", "minimum": 0 },
+        "auditEveryMerges": { "type": "integer", "minimum": 1 },
+        "minClaudeCodeVersion": { "type": "string" }
+      }
+    },
+    "protectedPaths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Exact file, or folder with trailing slash, relative to the project root."
+    },
+    "destructiveSql": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Case-insensitive regular expressions."
+    },
+    "forbiddenTerms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths", "terms"],
+      "properties": {
+        "paths": { "type": "array", "items": { "type": "string" } },
+        "terms": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "docs": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "required": ["spec", "moduleContract", "adrDir"]
+    }
+  }
+}

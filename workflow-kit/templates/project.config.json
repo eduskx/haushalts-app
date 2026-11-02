@@ -1,0 +1,48 @@
+{
+  "$schema": "./workflow-kit/schemas/project-config.schema.json",
+  "project": {
+    "name": "CHANGE-ME",
+    "language": "en"
+  },
+  "tracker": {
+    "adapter": "github",
+    "repo": "OWNER/REPO",
+    "allowedAuthors": ["OWNER"],
+    "labels": {
+      "ready": "ready",
+      "inProgress": "in-progress",
+      "inReview": "in-review",
+      "needsHuman": "needs-human",
+      "ui": "ui"
+    }
+  },
+  "commands": {
+    "install": "pnpm install --frozen-lockfile",
+    "check": "pnpm check",
+    "e2e": "pnpm e2e",
+    "preview": "pnpm preview"
+  },
+  "models": {
+    "planner": { "model": "opus", "fallback": "sonnet" },
+    "implementer": { "model": "sonnet" },
+    "reviewer": { "model": "sonnet" },
+    "tester": { "model": "sonnet" },
+    "auditor": { "model": "opus", "fallback": "sonnet" }
+  },
+  "limits": {
+    "maxDiffLines": 300,
+    "maxFixRounds": 2,
+    "auditEveryMerges": 10
+  },
+  "protectedPaths": [".github/", "workflow-kit/", "project.config.json", "CLAUDE.md"],
+  "destructiveSql": ["\\bdrop\\s+(table|column|schema)\\b", "\\btruncate\\b", "\\bdisable\\s+row\\s+level\\s+security\\b"],
+  "forbiddenTerms": {
+    "paths": ["packages/"],
+    "terms": []
+  },
+  "docs": {
+    "spec": "docs/specs/v1.md",
+    "moduleContract": "docs/module-contract.md",
+    "adrDir": "docs/adr/"
+  }
+}

@@ -1,0 +1,31 @@
+name: Ticket
+description: One small piece of work an agent can finish alone.
+body:
+  - type: input
+    id: module
+    attributes:
+      label: Module
+      description: The one module this ticket touches.
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What must be true afterwards. Not how to build it.
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Acceptance criteria
+      description: Each one decides yes or no, with concrete inputs and outcomes.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: input
+    id: depends
+    attributes:
+      label: Depends on
+      description: Issue numbers that must be merged first.
