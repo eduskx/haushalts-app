@@ -82,7 +82,7 @@ Prüfe UI-Änderungen gegen diese Regeln und nenne im Urteil die Regel-ID. Nur d
 | TYP-3 | Schriftgrößen in `rem` oder `em`, `html` nutzt unter `@supports` `font: -apple-system-body` | Kein `font-size` in `px` | Muss | Code | Quelle |
 | TYP-4 | Layout übersteht 200 % Text ohne abgeschnittene Titel, Tabs und Zahlen | | Muss | Browser | Apple |
 | TYP-5 | Schnitte nur Regular bis Bold | `font-weight` 400 bis 800 | Muss | Code | Apple |
-| TYP-6 | Stack über Token aus dem Theme, in diesem Muster: `ui-rounded`, selbst gehostete Ersatzschrift, `system-ui`, `sans-serif` | | Muss | Code | Projekt |
+| TYP-6 | Stack nur über Token aus dem Theme. Titel: `ui-serif`, `Georgia`, `serif`. Text: `system-ui` und Plattform-Schriften, `sans-serif` | | Muss | Code | Projekt |
 | TYP-7 | Keine SF-Schriftdateien im Repo | Suche nach `SF-Pro`, `SFPro`, `SF Rounded` | Muss | Code | Apple |
 | TYP-8 | Text und Abstände nutzen die Größenskala: 34, 28, 22, 20, 17, 16, 15, 13, 12, 11 | geteilt durch 17 in `rem` | Soll | Code | Apple |
 | TYP-9 | Eingabefelder mit mindestens 16 px, sonst zoomt iOS beim Fokus | | Muss | Browser | Projekt, nicht in der Recherche belegt, auf dem iPhone bestätigen |
