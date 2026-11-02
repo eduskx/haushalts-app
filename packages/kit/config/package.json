@@ -1,0 +1,24 @@
+{
+  "name": "@kit/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig": "./tsconfig.base.json",
+    "./eslint": "./eslint.mjs",
+    "./tailwind.css": "./tailwind.css"
+  },
+  "scripts": {
+    "typecheck": "echo 'nothing to typecheck'",
+    "lint": "echo 'nothing to lint'",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.30.0",
+    "typescript-eslint": "^8.35.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.30.0",
+    "vitest": "^3.2.0"
+  }
+}

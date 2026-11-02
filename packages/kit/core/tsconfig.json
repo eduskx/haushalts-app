@@ -1,0 +1,4 @@
+{
+  "extends": "@kit/config/tsconfig",
+  "include": ["src"]
+}
