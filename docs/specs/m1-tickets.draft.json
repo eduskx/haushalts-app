@@ -30,7 +30,9 @@
         "`pnpm check` führt typecheck, lint, test, dependency-cruiser, knip und die Wortprüfung aus."
       ],
       "labels": [],
-      "dependsOn": ["m1-01"],
+      "dependsOn": [
+        "m1-01"
+      ],
       "needsHuman": true
     },
     {
@@ -45,7 +47,9 @@
         "Der Workflow enthält keine Secrets."
       ],
       "labels": [],
-      "dependsOn": ["m1-02"],
+      "dependsOn": [
+        "m1-02"
+      ],
       "needsHuman": true
     },
     {
@@ -60,15 +64,19 @@
         "Eine unbekannte Route zeigt eine Fehlerseite statt einer leeren Seite.",
         "Alle sichtbaren Texte stehen in einer Sprachdatei, nicht im Komponentencode."
       ],
-      "labels": ["ui"],
-      "dependsOn": ["m1-01"],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-01"
+      ],
       "needsHuman": false
     },
     {
       "id": "m1-05",
       "title": "Deployment-Vorschau auf Vercel für jeden PR",
       "module": "apps/web",
-      "goal": "Jeder PR erhält eine HTTPS-Adresse, die man auf dem iPhone öffnen kann.",
+      "goal": "Jeder PR erhält eine HTTPS-Adresse, die man auf dem iPhone öffnen kann. Die Projekte legt Claude über die Connectoren an, nach Rückfrage; Zugangsdaten gehen nie ins Repo.",
       "criteria": [
         "Ein PR erzeugt eine Vorschau-URL, die `/` ausliefert.",
         "Die URL ist per HTTPS erreichbar (Voraussetzung für PWA und Service Worker).",
@@ -76,7 +84,9 @@
         "Unbekannte Pfade wie `/foo` liefern `index.html` (SPA-Fallback)."
       ],
       "labels": [],
-      "dependsOn": ["m1-04"],
+      "dependsOn": [
+        "m1-04"
+      ],
       "needsHuman": true
     },
     {
@@ -91,8 +101,12 @@
         "Ein Service Worker wird registriert und liefert die App-Hülle offline aus (Playwright-Test: Netz aus, Neuladen, Platzhalterseite sichtbar).",
         "Name und Icons liegen nur in `apps/web`, nicht in `packages/`."
       ],
-      "labels": ["ui"],
-      "dependsOn": ["m1-05"],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-05"
+      ],
       "needsHuman": true
     },
     {
@@ -107,15 +121,19 @@
         "„Verstanden“ blendet sie aus, und sie kommt nach Neuladen nicht wieder (Flag in localStorage; fehlt localStorage, erscheint sie bei jedem Start, ohne Fehler).",
         "Die Texte stehen in der Sprachdatei, die Erkennung ist eine reine Funktion mit Unit-Tests für mindestens vier User-Agents."
       ],
-      "labels": ["ui"],
-      "dependsOn": ["m1-06"],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-06"
+      ],
       "needsHuman": true
     },
     {
       "id": "m1-08",
       "title": "Lokale Supabase-Umgebung und pgTAP-Harness",
       "module": "apps/web",
-      "goal": "Datenbank, Migrationen und Datenbanktests laufen lokal und in CI.",
+      "goal": "Datenbank, Migrationen und Datenbanktests laufen lokal und in CI. Die Projekte legt Claude über die Connectoren an, nach Rückfrage; Zugangsdaten gehen nie ins Repo.",
       "criteria": [
         "`pnpm db:start` startet Supabase lokal, `pnpm db:test` führt pgTAP-Tests aus.",
         "Ein Beispieltest besteht, ein absichtlich falscher Test lässt `pnpm db:test` fehlschlagen.",
@@ -124,7 +142,9 @@
         "Im Repo liegen nur URL und Anon-Key als Beispielwerte in `.env.example`, kein Service-Key."
       ],
       "labels": [],
-      "dependsOn": ["m1-03"],
+      "dependsOn": [
+        "m1-03"
+      ],
       "needsHuman": false
     },
     {
@@ -140,7 +160,9 @@
         "Der Test läuft in `pnpm db:test` und damit in CI."
       ],
       "labels": [],
-      "dependsOn": ["m1-08"],
+      "dependsOn": [
+        "m1-08"
+      ],
       "needsHuman": false
     },
     {
@@ -152,10 +174,13 @@
         "Die Migration legt `signup_codes` an (Code als Hash, `used_at`, `used_by`, `expires_at`) mit aktivierter RLS.",
         "Ein pgTAP-Test zeigt: Rolle `anon` und eine eingeloggte Rolle können weder lesen noch einfügen noch ändern.",
         "Der Klartext-Code wird nirgends gespeichert, nur sein Hash.",
-        "Die Migration liegt als nummerierte Datei in `packages/kit/auth/migrations/` und besteht den Katalogtest."
+        "Die Migration liegt als nummerierte Datei in `packages/kit/auth/migrations/` und besteht den Katalogtest.",
+        "Eine Anleitung in `docs/` zeigt, wie Codes per SQL im Dashboard angelegt werden (Hash berechnen, `expires_at` setzen), ohne dass ein Klartext-Code im Repo steht."
       ],
       "labels": [],
-      "dependsOn": ["m1-09"],
+      "dependsOn": [
+        "m1-09"
+      ],
       "needsHuman": false
     },
     {
@@ -168,10 +193,13 @@
         "Ein unbekannter, abgelaufener oder verbrauchter Code erzeugt kein Konto und liefert dieselbe, nicht unterscheidbare Fehlermeldung.",
         "Zwei gleichzeitige Aufrufe mit demselben Code erzeugen genau ein Konto (Test mit parallelen Aufrufen).",
         "Nach fünf falschen Codes pro Minute und Client wird weiter abgewiesen (Rate Limit), auch mit einem später gültigen Code.",
-        "Der Service-Key wird nur serverseitig in der Edge Function genutzt und kommt nie in den Client-Bundle (Test sucht im Build nach dem Wert)."
+        "Der Service-Key wird nur serverseitig in der Edge Function genutzt und kommt nie in den Client-Bundle (Test sucht im Build nach dem Wert).",
+        "Die E-Mail-Bestätigung ist in der Supabase-Konfiguration ausgeschaltet; ein Passwort-Reset gibt es in M1 nicht."
       ],
       "labels": [],
-      "dependsOn": ["m1-10"],
+      "dependsOn": [
+        "m1-10"
+      ],
       "needsHuman": false
     },
     {
@@ -187,7 +215,10 @@
         "Ist der Speicher nicht verfügbar, landet die App auf der Login-Seite statt in einem Fehler."
       ],
       "labels": [],
-      "dependsOn": ["m1-04", "m1-08"],
+      "dependsOn": [
+        "m1-04",
+        "m1-08"
+      ],
       "needsHuman": false
     },
     {
@@ -203,8 +234,13 @@
         "Logout löscht die Session, und die Zurück-Taste führt nicht in eine geschützte Seite.",
         "Alle Texte stehen in der Sprachdatei, Eingabefelder haben Labels und passende `autocomplete`-Werte."
       ],
-      "labels": ["ui"],
-      "dependsOn": ["m1-11", "m1-12"],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-11",
+        "m1-12"
+      ],
       "needsHuman": true
     },
     {
@@ -219,8 +255,12 @@
         "Ohne neue Version erscheint kein Hinweis (Playwright mit zwei Builds).",
         "Der Hinweis unterbricht keine laufende Eingabe, er erscheint als Leiste."
       ],
-      "labels": ["ui"],
-      "dependsOn": ["m1-06"],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-06"
+      ],
       "needsHuman": false
     },
     {
@@ -235,8 +275,13 @@
         "Die Versionsvergleichsfunktion hat Unit-Tests für gleiche, kleinere, größere und ungültige Versionen; eine ungültige Version sperrt nicht.",
         "Ist die Abfrage offline nicht möglich, bleibt die App benutzbar."
       ],
-      "labels": ["ui"],
-      "dependsOn": ["m1-14", "m1-09"],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-14",
+        "m1-09"
+      ],
       "needsHuman": false
     },
     {
@@ -252,7 +297,10 @@
         "Die README bzw. docs nennen, dass WebKit kein iOS-Safari ersetzt (ADR 0002)."
       ],
       "labels": [],
-      "dependsOn": ["m1-13", "m1-15"],
+      "dependsOn": [
+        "m1-13",
+        "m1-15"
+      ],
       "needsHuman": true
     },
     {
@@ -267,17 +315,23 @@
         "Eine neue Version zeigt den Hinweis, und eine angehobene Mindestversion sperrt die App.",
         "Ergebnis steht als Kommentar am Ticket."
       ],
-      "labels": ["ui"],
-      "dependsOn": ["m1-16"],
+      "labels": [
+        "ui"
+      ],
+      "dependsOn": [
+        "m1-16"
+      ],
       "needsHuman": true
     }
   ],
   "openQuestions": [
-    "Woher kommen Registrierungscodes in M1? Vorschlag: Du legst sie per SQL oder Skript im Supabase-Dashboard an, es gibt keine Admin-Oberfläche. Die Einzug-Einladungen (M4) sind ein anderes Konzept und bleiben getrennt.",
-    "Bestätigungs-Mail bei Registrierung: Supabase schickt standardmäßig eine, und der eingebaute Versand ist stark begrenzt. Vorschlag: Bestätigung in M1 ausschalten, weil der Einladungscode bereits die Zugangskontrolle ist. Eigener Mailversand folgt, falls Passwort-Zurücksetzen gebraucht wird. Passwort-Zurücksetzen steht in M1 nicht, soll es rein?",
-    "Wer legt das Supabase-Projekt und das Vercel-Projekt an? Das sind Konten und Zugangsdaten, die ein Agent nicht anlegen sollte. m1-05 und m1-08 setzen das voraus.",
-    "Mehrere Tickets ändern geschützte Pfade (`.github/`, `packages/kit/config/`, `.dependency-cruiser.cjs`, `knip.json`) und sind deshalb `needsHuman`. Ist das so gewollt, oder legst du das Gerüst (m1-01 bis m1-03) selbst an?",
-    "Wo liegt `min_client_version`? Vorschlag: eine Tabelle in der Datenbank statt einer Datei im Build, damit du sie ohne Release anheben kannst. Das schließt Offline-Clients nicht aus (siehe Kriterium in m1-15).",
-    "Arbeitstitel für Manifest und Icons (m1-06): Platzhalter genügt, Umbenennen ist laut Spec erst bis M8 nötig."
-  ]
+    "Geschützte Pfade (m1-01 bis m1-03): Die Regel in CLAUDE.md bleibt bestehen. Die Tickets bleiben `needsHuman`; der Agent baut alles, du gibst nur die Änderung an geschützten Pfaden im PR frei. Das ist ein Klick am Handy.",
+    "App-Name für Manifest und Icons (m1-06): Platzhalter, Umbenennen bis M8."
+  ],
+  "resolved": {
+    "signupCodes": "Per SQL im Dashboard, keine Admin-Oberfläche.",
+    "email": "Bestätigung aus, kein Passwort-Reset in M1.",
+    "accounts": "Claude legt Supabase- und Vercel-Projekt über die Connectoren an, nach Rückfrage.",
+    "minVersion": "Datenbank-Tabelle (Standard, nicht gefragt)."
+  }
 }
