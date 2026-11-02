@@ -13,7 +13,7 @@ Baut die App nach Apples Regeln für Struktur, Zielgrößen, Kontrast und Dark M
 | Navigation | 3 bis 5 Tabs, nur Bereiche, keine Aktionen, feste Leiste unten | `[Apple]` für "fünf oder weniger" und "keine Aktionen" ([HIG Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars)); `[Ableitung]` für die Untergrenze 3 |
 | Glas-Optik | Blur, Sättigung, feine Kontur; keine Lichtbrechung | `[Drittquelle]` ([DEV](https://dev.to/devyatov/liquid-glass-on-the-web-6-ways-to-build-it-with-css-and-svg-3m07)) |
 | Icons | Kein SF Symbols im Web, Phosphor als Erstwahl, Lizenz vor Release prüfen | `[Drittquelle]` Snippet ([pub.dev](https://pub.dev/packages/flutter_cupertino_symbols)); Phosphor-Lizenz `[nicht belegt]` |
-| Schrift | `ui-rounded`, dann selbst gehosteter Rounded-Fallback; SF-Dateien nie bündeln | `[Apple]` ([Forum, Mitarbeiter](https://developer.apple.com/forums/thread/127350)); Fallback `[nicht belegt]` |
+| Schrift | Gewählte Richtung Abend: Titel `ui-serif`, Text `system-ui`, keine eigene Schriftdatei; SF-Dateien nie bündeln | `[Apple]` ([Forum, Mitarbeiter](https://developer.apple.com/forums/thread/127350)); Fallback `[nicht belegt]` |
 | Zielgrößen | 44 x 44 pt als Standard, 28 pt nur als Ausnahme | `[Apple]` ([HIG Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)) |
 | Kontrast | Text mindestens 4,5:1 in beiden Modi, 7:1 als Ziel bei kleinem Text | `[Apple]` ([HIG Dark Mode](https://developer.apple.com/design/human-interface-guidelines/dark-mode)) |
 | Dark Mode | Folgt dem System, kein Schalter in der App | `[Apple]` ([HIG Dark Mode](https://developer.apple.com/design/human-interface-guidelines/dark-mode)) |
@@ -60,6 +60,8 @@ Beim Speicher schützt die Installation nur teilweise. Home-Screen-Web-Apps sind
 **`ui-rounded` liefert sehr wahrscheinlich SF Pro Rounded, kein Test bestätigt es direkt.** Die Kette hat drei Glieder: Safari unterstützt `ui-rounded` ab 13.1, Chrome, Edge und Firefox laut caniuse nicht. `[Drittquelle]` ([caniuse](https://caniuse.com/extended-system-fonts)) WebKit hat das Keyword aus dem SPI geholt. `[Drittquelle]` ([WebKit-Commit](https://webkit.googlesource.com/WebKit/+/3fa74877b7c536983f160d5f9f2d7ff9b7539e24%5E%21/)) UIKit liefert für das Rounded-Design auf iOS SF Pro Rounded. `[Apple]` ([UIKit](https://developer.apple.com/documentation/uikit/uifontdescriptor/systemdesign/rounded.md)) Dass WebKit das Keyword auf denselben Schnitt abbildet, bleibt der Schluss daraus. `[Ableitung]`
 
 Der Stack lautet `ui-rounded, "Nunito", system-ui, sans-serif`. `[Ableitung]` Achtet auf die Reihenfolge: `font: -apple-system-body` ist ein Shorthand und setzt auch die Familie, also muss `font-family` danach folgen, und Tailwinds Basisstile dürfen die Regel nicht überschreiben. `[Ableitung, ungetestet]` Nunito und andere Rounded-Fallbacks (Quicksand, Fredoka, Baloo 2, M PLUS Rounded 1c) stehen laut Notizen unter SIL OFL 1.1, Phosphor unter MIT, Lucide unter ISC, Tabler und Iconoir unter MIT. `[nicht belegt, Trainingswissen]` Phosphor passt wegen seiner sechs Gewichte am besten zu SF Symbols. `[nicht belegt]` Selbst hosten empfehlen die Notizen wegen des Google-Fonts-Urteils des LG München von 2022; auch dafür liegt keine geöffnete Quelle vor. `[nicht belegt]`
+
+**Nachtrag nach der Stilwahl:** Der Nutzer hat die Richtung Abend gewählt, sie nutzt `ui-rounded` nicht. Die Titel laufen über `ui-serif`, der Text über `system-ui`. Der Apple-Mitarbeiter nennt das Keyword für serif im selben Thread `[Apple]` ([Forum 127350](https://developer.apple.com/forums/thread/127350)), dass es auf dem iPhone New York liefert, hat die Recherche nicht geprüft. `[nicht belegt]` Die Aussagen zu `ui-rounded` bleiben als Rechercheergebnis stehen.
 
 ## Zehn Vorbilder liefern Mechanik, aber kaum Belege zur Optik
 
@@ -194,7 +196,7 @@ Testet die aktuelle iOS-Version und, falls verfügbar, die Vorgängerversion, je
 | Tastatur öffnen und schließen | Keine verrutschten fixierten Leisten, keine Lücke unten, `visualViewport.offsetTop` zurück auf 0 |
 | Sheet mit Texteingabe | Swipe-down, Grabber und Tastatur stören sich nicht; ungesicherte Änderungen lösen eine Nachfrage aus |
 | Swipe-Back und Pull-to-Refresh | Verhalten dokumentiert, keine Konflikte mit Karten, Listen, Sheets |
-| `ui-rounded` | Gerendert als SF Pro Rounded im Vergleich zu nativer Referenz; Schriftname im Web Inspector prüfen; Fallback greift auf anderen Browsern |
+| `ui-serif` und `system-ui` | Titel gerendert als New York, Text als SF Pro; Schriftname im Web Inspector prüfen; Fallback greift auf anderen Browsern |
 | Dynamic Type | Textgröße in Einstellungen ändert App-Text; AX5 und 200 % ohne abgeschnittene Tabs, Zahlen und Titel |
 | Reduced Motion | Loops pausieren, Übergänge werden Fades |
 | Increase Contrast, Reduce Transparency | Text bleibt mit und ohne Blur lesbar; Kontrast gemessen |

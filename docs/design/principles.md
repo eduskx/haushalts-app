@@ -54,7 +54,7 @@ Wer plant und erinnert, arbeitet. Die App macht das sichtbar, statt nur das Erle
 Tab Bar, Sheets, Größen und Gesten folgen Apples Gewohnheiten. Was Safari nicht kann, baust du einfacher und ehrlich.
 
 - **Prüffrage:** Weiß eine iPhone-Nutzerin ohne Erklärung, wie sich das bedienen lässt? Täuscht dieser Screen einen Systemeffekt vor, der nicht funktioniert?
-- **Besteht:** Blur mit Kontur als Glas-Annäherung, eigene Icons, `ui-rounded` als Systemverweis.
+- **Besteht:** Blur mit Kontur als Glas-Annäherung, eigene Icons, `ui-serif` und `system-ui` als Systemverweise.
 - **Fällt durch:** SF Symbols oder gebündelte SF-Dateien, nachgebaute Lichtbrechung, Tabs als Aktionen, Abhängigkeit von Haptik.
 - **Beleg:** HIG, und die PWA-Grenzen in research.md.
 
