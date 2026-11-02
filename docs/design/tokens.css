@@ -1,0 +1,130 @@
+/*
+ * Token-Satz der Stilrichtung "Küche", vom Nutzer gewählt am Design-Gate.
+ * Vorschau: directions.html, Regeln: hig-checklist.md.
+ *
+ * Die Namen sind der Vertrag für packages/kit/ui und tragen keinen Bezug zu dieser App.
+ * Die Werte gehören in das Theme von apps/web. In Phase 2 zieht diese Datei dorthin um.
+ * Der Modus folgt dem System, einen Schalter in der App gibt es nicht (DRK-4).
+ *
+ * Herkunft: Die Typo-Skala stammt aus der HIG (Dynamic Type, Standardgröße Large).
+ * Farben, Radien, Abstände und Dauern hat dieses Projekt festgelegt, Apple nennt dafür keine Werte.
+ * Figurenfarben für Haut und Haar liegen nicht hier, sie gehören als Daten ins Avatar-Modul.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Hintergründe: Base für Seiten, Surface für Karten und Listen, Elevated für Sheets und Popover */
+  --color-bg: #EDF0E3;
+  --color-surface: #FBFBF4;
+  --color-elevated: #FFFFFF;
+
+  /* Text: 1 bis 3 mit mindestens 4,5:1 auf allen Hintergründen. 4 nur für Platzhalter und Deaktiviertes, mindestens 3:1 */
+  --color-text-1: #1F2A22;
+  --color-text-2: #47544A;
+  --color-text-3: #5B685D;
+  --color-text-4: #7A8674;
+
+  /* Akzent: Tannengrün für Handlungen, Tomate als zweite Farbe. Tomate ist kein Fehler und keine Mahnung (CLR-6) */
+  --color-accent: #24664A;
+  --color-on-accent: #FFFFFF;
+  --color-secondary: #AE3F27;
+  --color-decor: #EDC04F; /* Butter, nur Schmuck, nie Text */
+
+  /* Linien und Ränder: separator trennt nur, control grenzt Bedienelemente ab (3:1) */
+  --color-separator: #DDE2D1;
+  --color-control: #7A8674;
+
+  /* Glas und Abdeckung. Die Leiste bleibt auch ohne Blur lesbar (DRK-3) */
+  --color-bar: rgba(251, 251, 244, .9);
+  --color-scrim: rgba(0, 0, 0, .34);
+  --blur-bar: blur(18px) saturate(1.5);
+
+  /* Figur und Bühne */
+  --color-stage: #DCE5C8;
+  --color-stage-floor: #C7D3AE;
+  --color-figure-line: #26302A;
+  --color-figure-top: #2F7A59;
+  --color-figure-bottom: #44524A;
+
+  /* Schrift. ui-rounded liefert auf dem iPhone sehr wahrscheinlich SF Pro Rounded. Nunito wird selbst gehostet, Lizenz vorher prüfen (ICN-2) */
+  --font-display: ui-rounded, "Nunito", system-ui, sans-serif;
+  --font-body: ui-rounded, "Nunito", system-ui, sans-serif;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --tracking-display: -.01em;
+
+  /* Typo-Skala aus der HIG, 1rem entspricht Body mit 17 pt. Das html-Element nutzt font: -apple-system-body (TYP-3) */
+  --text-large-title: 2rem;        /* 34/41 */
+  --text-title-1: 1.647rem;        /* 28/34 */
+  --text-title-2: 1.294rem;        /* 22/28 */
+  --text-title-3: 1.176rem;        /* 20/25 */
+  --text-body: 1rem;               /* 17/22, auch Headline */
+  --text-callout: .941rem;         /* 16/21 */
+  --text-subhead: .882rem;         /* 15/20 */
+  --text-footnote: .765rem;        /* 13/18 */
+  --text-caption-1: .706rem;       /* 12/16 */
+  --text-caption-2: .647rem;       /* 11/13, kleinster Wert */
+
+  /* Radien: Innen ist Karte minus Innenabstand 8 (LST-6) */
+  --radius-card: 20px;
+  --radius-inner: 12px;
+  --radius-button: 999px;
+  --radius-bar: 32px;
+  --radius-sheet: 26px;
+  --radius-check: 50%;
+
+  /* Abstände und Größen */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --size-target: 44px;
+  --size-row: 48px;
+  --border-card: 1px solid var(--color-separator);
+  --shadow-bar: 0 0 0 1px var(--color-separator), 0 6px 22px rgba(0, 0, 0, .16);
+
+  /* Bewegung. Unter prefers-reduced-motion entfallen Wege und Loops (MOT-1) */
+  --duration-press: 100ms;
+  --duration-feedback: 200ms;
+  --duration-sheet: 220ms;
+  --ease-standard: ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #141C17;
+    --color-surface: #1F2A23;
+    --color-elevated: #29352D;
+
+    --color-text-1: #EEF2E6;
+    --color-text-2: #C2CCBD;
+    --color-text-3: #A5B09F;
+    --color-text-4: #84917F;
+
+    --color-accent: #7FD0A6;
+    --color-on-accent: #0D2A1C;
+    --color-secondary: #F0977F;
+    --color-decor: #EDC04F;
+
+    --color-separator: #35423A;
+    --color-control: #84917F;
+
+    --color-bar: rgba(31, 42, 35, .9);
+
+    --color-stage: #46594C;
+    --color-stage-floor: #384A3E;
+    --color-figure-line: #141C17;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-press: 0ms;
+    --duration-feedback: 0ms;
+    --duration-sheet: 0ms;
+  }
+}
