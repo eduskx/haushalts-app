@@ -11,7 +11,7 @@ A reusable agent pipeline for Claude Code. Everything project-specific lives in 
 | `hooks/` | Blocks dangerous commands and protected-path edits. Guards against accidents, not a security boundary | ready, tested |
 | `schemas/` | Config schema and the JSON the agents must return | ready |
 | `templates/` | CI and PR templates, CLAUDE.md skeleton | ready |
-| `cli/` | `wf`, the deterministic orchestrator. Run with `node workflow-kit/cli/wf.mjs <command>` | `next` ready, more to come |
+| `cli/` | `wf`, the deterministic orchestrator. Run with `node workflow-kit/cli/wf.mjs <command>` | `next` and `check` ready, more to come |
 
 ## How a ticket flows
 
@@ -39,6 +39,8 @@ A ticket is startable when it is in the ready status, has neither `needsHuman` n
 Run the `intake` skill before a pipeline run. It asks everything at once and stores the answers in the ticket, so unattended runs have no reason to stop. If an agent still hits an open question, `wf` writes it to the ticket's questions section and sets `needsHuman`, and the next intake round asks it. This return path arrives with `wf`.
 
 Agents never push, merge or set statuses. They return commits and JSON, and `wf` acts. Run agents somewhere without GitHub or tracker credentials and without production secrets.
+
+`wf check` has two halves. The diff rules (`limits.maxDiffLines`, tests and lockfiles excluded, `protectedPaths`, `destructiveSql`, `forbiddenTerms`) only read git and run no project code, and they take their config from the base branch, so a diff cannot loosen them. `commands.check` runs code an agent wrote, so it only starts where `WF_SANDBOX=1` is set and no credential is in the environment, and then with a stripped environment. The marker prevents accidents, it proves nothing: credentials such as a `gh` login in the system keyring are invisible to it. Only the sandbox itself keeps them out. Where credentials exist, use `--diff-only`. Judge the human decision outside the sandbox with the kit from the base branch, because code inside the sandbox can be changed by the agent.
 
 Tickets live in Linear, code and pull requests on GitHub. Linear is currently the only tracker adapter, and `tracker` in the config is where another one would plug in.
 
