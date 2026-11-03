@@ -11,7 +11,7 @@ A reusable agent pipeline for Claude Code. Everything project-specific lives in 
 | `hooks/` | Blocks dangerous commands and protected-path edits. Guards against accidents, not a security boundary | ready, tested |
 | `schemas/` | Config schema and the JSON the agents must return | ready |
 | `templates/` | CI and PR templates, CLAUDE.md skeleton | ready |
-| `cli/` | `wf`, the deterministic orchestrator. Run with `node workflow-kit/cli/wf.mjs <command>` | `next` and `check` ready, more to come |
+| `cli/` | `wf`, the deterministic orchestrator. Run with `node workflow-kit/cli/wf.mjs <command>` | `next`, `check` and `block` ready, `run` to come |
 
 ## How a ticket flows
 
@@ -36,7 +36,7 @@ A ticket is startable when it is in the ready status, has neither `needsHuman` n
 | `humanTask` | Only a human can do it | Instead of a run | Never takes it |
 | `humanReview` | The human judges the result | After the PR | Builds it, no auto-merge |
 
-Run the `intake` skill before a pipeline run. It asks everything at once and stores the answers in the ticket, so unattended runs have no reason to stop. If an agent still hits an open question, `wf` writes it to the ticket's questions section and sets `needsHuman`, and the next intake round asks it. This return path arrives with `wf`.
+Run the `intake` skill before a pipeline run. It asks everything at once and stores the answers in the ticket, so unattended runs have no reason to stop. If an agent still hits an open question, `wf` writes it to the ticket's questions section and sets `needsHuman`, and the next intake round asks it. The same happens when `limits.maxFixRounds` are used up or the result is invalid. The ticket returns to the ready status, because intake only loads that status. `wf block <ticket> <question>` does this by hand.
 
 Agents never push, merge or set statuses. They return commits and JSON, and `wf` acts. Run agents somewhere without GitHub or tracker credentials and without production secrets.
 

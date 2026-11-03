@@ -50,6 +50,22 @@ describe('wf next', () => {
   })
 })
 
+describe('wf block', () => {
+  it('hands the ticket to the next intake round', async () => {
+    const tickets = [ticket('T-1')]
+    const { code, lines } = await run(['block', 'T-1', 'Which one?'], tickets)
+    assert.equal(code, 0)
+    assert.equal(lines[0], 'T-1 now waits for intake.')
+    assert.match(tickets[0].description, /Which one\?/)
+    assert.ok(tickets[0].labels.includes('needs-human'))
+  })
+
+  it('needs a ticket and a question', async () => {
+    assert.equal((await run(['block', 'T-1'], [ticket('T-1')])).code, 2)
+    assert.equal((await run(['block', 'T-1', '  '], [ticket('T-1')])).code, 2)
+  })
+})
+
 describe('wf', () => {
   const script = path.join(path.dirname(fileURLToPath(import.meta.url)), 'wf.mjs')
 

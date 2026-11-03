@@ -101,6 +101,54 @@ describe('createLinearTracker', () => {
     assert.deepEqual(ticket.comments.map(({ authorId }) => authorId), ['allowed-user', null])
   })
 
+  const answer = (data) => ({ ok: true, status: 200, json: async () => ({ data }) })
+  const ids = (labels, states = [{ id: 'state-1' }]) =>
+    answer({ workflowStates: { nodes: states }, issueLabels: { nodes: labels } })
+  const target = { id: 'uuid-T-1', identifier: 'T-1' }
+  const change = { description: 'New', status: 'Todo', addLabel: 'needs-human' }
+
+  it('updates description, status and label in one mutation', async () => {
+    const { requests, instance } = tracker([
+      ids([
+        { id: 'other-team', team: { key: 'OTHER' } },
+        { id: 'label-1', team: { key: 'TEAM' } },
+      ]),
+      answer({ issueUpdate: { success: true } }),
+    ])
+    await instance.updateTicket(target, change)
+    assert.equal(requests.length, 2)
+    assert.deepEqual(requests[1].variables, {
+      id: 'uuid-T-1',
+      input: { description: 'New', stateId: 'state-1', addedLabelIds: ['label-1'] },
+    })
+  })
+
+  it('falls back to a workspace label', async () => {
+    const { requests, instance } = tracker([
+      ids([{ id: 'workspace', team: null }]),
+      answer({ issueUpdate: { success: true } }),
+    ])
+    await instance.updateTicket(target, change)
+    assert.deepEqual(requests[1].variables.input.addedLabelIds, ['workspace'])
+  })
+
+  it('changes nothing when the label or status is missing', async () => {
+    const noLabel = tracker([ids([{ id: 'other-team', team: { key: 'OTHER' } }])])
+    await assert.rejects(noLabel.instance.updateTicket(target, change), /Label "needs-human"/)
+    assert.equal(noLabel.requests.length, 1)
+    const noStatus = tracker([ids([{ id: 'label-1', team: { key: 'TEAM' } }], [])])
+    await assert.rejects(noStatus.instance.updateTicket(target, change), /Status "Todo"/)
+    assert.equal(noStatus.requests.length, 1)
+  })
+
+  it('fails when Linear reports no success', async () => {
+    const { instance } = tracker([
+      ids([{ id: 'label-1', team: { key: 'TEAM' } }]),
+      answer({ issueUpdate: { success: false } }),
+    ])
+    await assert.rejects(instance.updateTicket(target, change), /did not update T-1/)
+  })
+
   it('reports API errors without the key', async () => {
     const { instance } = tracker([
       { ok: false, status: 400, statusText: 'Bad', json: async () => ({ errors: [{ message: 'Query too complex' }] }) },

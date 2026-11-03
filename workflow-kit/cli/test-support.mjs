@@ -43,6 +43,10 @@ export function fakeTracker(tickets) {
   return {
     tickets,
     getTicket: async (identifier) => tickets.find((candidate) => candidate.identifier === identifier),
+    updateTicket: async (target, { description, status, addLabel }) => {
+      Object.assign(target, { description, status })
+      if (!target.labels.includes(addLabel)) target.labels.push(addLabel)
+    },
     listReadyTickets: async () => tickets.filter(({ status }) => status === config.tracker.statuses.ready),
   }
 }
