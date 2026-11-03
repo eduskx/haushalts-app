@@ -2,3 +2,4 @@
 export function assertNever(value: never): never {
   throw new Error(`Unexpected value: ${JSON.stringify(value)}`);
 }
+export const brokenOnPurpose: number = "kein Text";
