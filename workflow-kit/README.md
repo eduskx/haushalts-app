@@ -11,7 +11,7 @@ A reusable agent pipeline for Claude Code. Everything project-specific lives in 
 | `hooks/` | Blocks dangerous commands and protected-path edits. Guards against accidents, not a security boundary | ready, tested |
 | `schemas/` | Config schema and the JSON the agents must return | ready |
 | `templates/` | CI and PR templates, CLAUDE.md skeleton | ready |
-| `cli/` | `wf`, the deterministic orchestrator | planned for phase 4 |
+| `cli/` | `wf`, the deterministic orchestrator. Run with `node workflow-kit/cli/wf.mjs <command>` | `next` ready, more to come |
 
 ## How a ticket flows
 
