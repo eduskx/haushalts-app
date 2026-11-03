@@ -2,33 +2,51 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 
-const COMMAND_START = String.raw`(?:^|[;&|(\n]\s*)`
+const COMMAND_START = String.raw`(?:^|[;&|(\n]\s*)(?:\w+=\S*\s+)*`
+const GIT_PUSH = String.raw`\bgit\s+(?:-[cC]\s+\S+\s+)*push\b[^;&|\n]*`
+const ENV_FILE = String.raw`(?:^|[\s<>'"=/])\.env(?!\.example(?:$|[\s;&|'")]))(?:\.[\w-]+)?(?=$|[\s;&|'")])`
 const RM_RECURSIVE_FORCE = String.raw`\brm\s+(?:-[a-zA-Z]*(?:rf|fr)[a-zA-Z]*|-r\s+-f|-f\s+-r|--recursive\s+--force|--force\s+--recursive)\s+`
 
 const ALWAYS_BLOCKED = [
-  { pattern: /\bgit\s+push\b[^;&|\n]*(?:\s|:)(?:main|master)(?:\s|$)/, reason: 'Pushing to the main branch is not allowed. Use a pull request.' },
-  { pattern: /\bgit\s+push\b[^;&|\n]*\s(?:--force(?:-with-lease)?|-f)(?:\s|=|$)/, reason: 'Force pushing is not allowed.' },
+  { pattern: new RegExp(`${GIT_PUSH}(?:\\s|:|\\+|refs/heads/)(?:main|master)(?=\\s|;|&|\\||$)`), reason: 'Pushing to the main branch is not allowed. Use a pull request.' },
+  { pattern: new RegExp(`${GIT_PUSH}\\s(?:--force(?:-with-lease)?|-f|\\+\\S+)(?:\\s|=|$)`), reason: 'Force pushing is not allowed.' },
   { pattern: /(?:^|\s)--no-verify(?:\s|$)/, reason: 'Skipping git hooks is not allowed. Fix the cause instead.' },
   { pattern: /\bgit\s+config\s+--global\b/, reason: 'Changing global git configuration is not allowed.' },
   { pattern: new RegExp(`${RM_RECURSIVE_FORCE}(?:/|~|\\$HOME|\\.|\\.\\.|\\*)(?:/?\\*?)(?:\\s|$)`), reason: 'Recursively deleting a root, home or working directory is not allowed.' },
-  { pattern: /\bgh\s+auth\s+token\b/, reason: 'Reading the GitHub token is not allowed.' },
-  { pattern: /\bgh\s+pr\s+merge\b/, reason: 'Merging is done by the orchestrator or a human.' },
-  { pattern: /\bgh\s+api\b[^;&|\n]*\/statuses\//, reason: 'Setting commit statuses is done by the orchestrator.' },
+  { pattern: new RegExp(ENV_FILE), reason: 'Env files may contain secrets and are off limits.' },
+  { pattern: new RegExp(`${COMMAND_START}gh\\s+auth\\s+token\\b`), reason: 'Reading the GitHub token is not allowed.' },
+  { pattern: new RegExp(`${COMMAND_START}gh\\s+pr\\s+merge\\b`), reason: 'Merging is done by the orchestrator or a human.' },
+  { pattern: new RegExp(`${COMMAND_START}gh\\s+api\\b[^;&|\\n]*/statuses/`), reason: 'Setting commit statuses is done by the orchestrator.' },
 ]
 
 const AGENT_BLOCKED = [
   { pattern: new RegExp(`${COMMAND_START}gh\\s`), reason: 'Pipeline agents do not use gh. The orchestrator talks to GitHub.' },
-  { pattern: /\bgit\s+push\b/, reason: 'Pipeline agents do not push. The orchestrator handles it.' },
+  { pattern: new RegExp(GIT_PUSH), reason: 'Pipeline agents do not push. The orchestrator handles it.' },
 ]
 
-export function checkCommand(command, { agentMode = false } = {}) {
+// Shell commands that write to their file arguments. Best effort: a script can still get around it.
+const WRITES_FILES = /(?:>|\b(?:sed\s+(?:-\S+\s+)*-i|tee|mv|cp|rm|ln|chmod|truncate|dd)\b)/
+
+function writesProtectedPath(command, protectedPaths) {
+  if (!WRITES_FILES.test(command)) return null
+  return protectedPaths.find((entry) => {
+    const escaped = entry.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`(?:^|[\\s<>'"=/])(?:\\./)?${escaped}(?:$|[\\s;&|'")]|(?<=/)\\S)`).test(command)
+  })
+}
+
+export function checkCommand(command, { agentMode = false, protectedPaths = [] } = {}) {
   const rules = agentMode ? [...ALWAYS_BLOCKED, ...AGENT_BLOCKED] : ALWAYS_BLOCKED
-  return rules.find((rule) => rule.pattern.test(command))?.reason ?? null
+  const reason = rules.find((rule) => rule.pattern.test(command))?.reason
+  if (reason) return reason
+  const hit = agentMode ? writesProtectedPath(command, protectedPaths) : null
+  return hit ? `${hit} is a protected path. Report that it needs changing instead.` : null
 }
 
 function toRelative(filePath, projectDir) {
   const relative = path.relative(path.resolve(projectDir), path.resolve(projectDir, filePath))
-  return relative.split(path.sep).join('/')
+  // A path inside a worktree counts as the same path in the main checkout.
+  return relative.split(path.sep).join('/').replace(/^\.claude\/worktrees\/[^/]+\//, '')
 }
 
 function matchesEntry(relative, entry) {
