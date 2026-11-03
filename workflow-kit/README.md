@@ -51,7 +51,7 @@ Until `wf init` exists:
 1. Install the plugin. For one session: `claude --plugin-dir path/to/workflow-kit`. Permanently: `claude plugin marketplace add path/to/workflow-kit`, then `claude plugin install workflow-kit@workflow-kit-marketplace --scope project`.
 2. Copy `templates/project.config.json` to the project root and fill it in.
 3. Copy `templates/CLAUDE.md.tmpl` to `CLAUDE.md`.
-4. Copy `templates/github/` to `.github/` and `templates/ci.yml` to `.github/workflows/ci.yml`, then adapt the commands.
+4. Copy `templates/github/` to `.github/` and `templates/ci.yml` to `.github/workflows/ci.yml`, then adapt the commands. The template reads the Node version from `.nvmrc`.
 5. Write the project's own module contract at `docs.moduleContract`.
 6. In Linear, create the project and the labels named in the config, including `humanTask` and `humanReview`. Connect Linear to GitHub so that pull requests link to tickets.
 
