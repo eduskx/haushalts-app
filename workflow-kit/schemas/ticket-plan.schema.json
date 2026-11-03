@@ -11,7 +11,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "title", "module", "goal", "criteria", "labels", "dependsOn", "needsHuman"],
+        "required": ["id", "title", "module", "goal", "criteria", "labels", "dependsOn", "humanInput", "humanGate"],
         "properties": {
           "id": { "type": "string", "description": "Local id, used only by dependsOn." },
           "title": { "type": "string" },
@@ -20,10 +20,41 @@
           "criteria": { "type": "array", "minItems": 1, "items": { "type": "string" } },
           "labels": { "type": "array", "items": { "type": "string" } },
           "dependsOn": { "type": "array", "items": { "type": "string" } },
-          "needsHuman": { "type": "boolean" }
+          "humanInput": {
+            "type": "array",
+            "description": "Questions the human must answer before the ticket can start. A non-empty list means the ticket gets tracker.labels.needsHuman.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["question", "options"],
+              "properties": {
+                "question": { "type": "string" },
+                "options": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 4,
+                  "description": "Recommendation first.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["label", "description"],
+                    "properties": {
+                      "label": { "type": "string" },
+                      "description": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "humanGate": {
+            "enum": ["none", "task", "review"],
+            "description": "task: only a human can do it, agents never run it (tracker.labels.humanTask). review: agents build it, the human looks at the result before merge (tracker.labels.humanReview)."
+          },
+          "humanReviewFocus": { "type": "string", "description": "What the human should look at. Required in practice when humanGate is review." }
         }
       }
     },
-    "openQuestions": { "type": "array", "items": { "type": "string" } }
+    "openQuestions": { "type": "array", "description": "Questions about the plan as a whole, not tied to one ticket.", "items": { "type": "string" } }
   }
 }

@@ -20,7 +20,13 @@
       "idea": "idea",
       "inReview": "in-review",
       "needsHuman": "needs-human",
+      "humanTask": "human-task",
+      "humanReview": "human-review",
       "ui": "ui"
+    },
+    "sections": {
+      "questions": "Open questions",
+      "answers": "Answers"
     }
   },
   "commands": {

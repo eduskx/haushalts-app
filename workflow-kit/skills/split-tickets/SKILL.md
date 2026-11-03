@@ -31,4 +31,11 @@ Agents work best on small, unambiguous tickets, and small tickets are cheap to r
 - It only makes sense together with the next ticket
 - The criteria require reading the implementation to judge
 
-A ticket that needs human taste gets `needsHuman: true`, with what the human should look at.
+## What the human must do
+
+Sort each human touchpoint by when it happens. The `intake` skill collects the first two before the run.
+
+- **A decision before the start:** add it to `humanInput` as a question with options. Check the docs first, and do not ask what they already decide.
+- **Work only a human can do**, such as accounts or a test on a device: set `humanGate: "task"`. Keep it separate from tickets agents can run.
+- **A judgement of the result**, such as taste: set `humanGate: "review"` and say in `humanReviewFocus` what to look at.
+- **A change to protected paths or destructive SQL:** nothing to set. The orchestrator sees it in the diff and leaves the merge to the human.

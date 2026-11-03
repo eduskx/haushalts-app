@@ -15,6 +15,6 @@ Rules:
 - Name the module each ticket touches. A ticket that spans two feature modules is wrong: split it or move the shared part to the kit layer.
 - Order tickets so dependencies come first. Prefer a thin working slice over finishing a layer.
 - Add the `ui` label only when a user can see the change.
-- If the spec is ambiguous, list the question in `openQuestions` instead of guessing.
+- If the spec leaves a ticket ambiguous, add the question to that ticket's `humanInput` instead of guessing. Use `openQuestions` only for questions about the plan as a whole.
 
 Write tickets in `project.language`. Return only JSON matching `schemas/ticket-plan.schema.json`.

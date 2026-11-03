@@ -30,7 +30,7 @@ workflow-kit    Agenten-Workflow als Claude-Code-Plugin
 docs            Spec, ADRs, Design, Modul-Vertrag
 ```
 
-Stand: Phase 0, noch kein App-Code. Der Spec-Entwurf liegt in [docs/specs/v1.md](docs/specs/v1.md).
+Stand: Monorepo-Gerüst steht, noch kein App-Code. Die Struktur oben ist der Zielzustand. Die freigegebene Spec liegt in [docs/specs/v1.md](docs/specs/v1.md).
 
 ## Nebenbei Erwähntes
 
@@ -39,6 +39,10 @@ Erwähnt der Nutzer nebenbei eine Feature-Idee oder wie wir etwas machen sollen,
 ## Tickets
 
 Tickets liegen in Linear, im Projekt `haushalts-app`. Lege keine GitHub-Issues an, siehe [ADR 0006](docs/adr/0006-linear-als-tracker.md). GitHub ist nur für Code und PRs da.
+
+## Fragerunde vor dem Start
+
+Bevor Agenten an Tickets arbeiten, sammelt der Skill `workflow-kit:intake` alle offenen Fragen per Rückfrage ein und schreibt die Antworten ins Ticket. Die Bedeutung der Labels steht in [ADR 0008](docs/adr/0008-startbereitschaft-von-tickets.md).
 
 ## Sprache
 

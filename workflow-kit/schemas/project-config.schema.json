@@ -20,7 +20,7 @@
     "tracker": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["adapter", "team", "project", "allowedAuthors", "statuses", "labels"],
+      "required": ["adapter", "team", "project", "allowedAuthors", "statuses", "labels", "sections"],
       "properties": {
         "adapter": { "enum": ["linear"] },
         "team": { "type": "string" },
@@ -45,12 +45,24 @@
         "labels": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["idea", "inReview", "needsHuman", "ui"],
+          "required": ["idea", "inReview", "needsHuman", "humanTask", "humanReview", "ui"],
           "properties": {
             "idea": { "type": "string" },
             "inReview": { "type": "string" },
-            "needsHuman": { "type": "string" },
+            "needsHuman": { "type": "string", "description": "A question is open right now. The pipeline skips the ticket until it is answered." },
+            "humanTask": { "type": "string", "description": "Only a human can do this. The pipeline never takes it." },
+            "humanReview": { "type": "string", "description": "Agents build it, but it does not auto-merge. The human looks at the result." },
             "ui": { "type": "string" }
+          }
+        },
+        "sections": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["questions", "answers"],
+          "description": "Headings in the ticket description that intake and the orchestrator read and write.",
+          "properties": {
+            "questions": { "type": "string" },
+            "answers": { "type": "string" }
           }
         }
       }

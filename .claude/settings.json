@@ -10,5 +10,16 @@
       "mcp__Linear__save_comment",
       "mcp__Linear__save_project"
     ]
+  },
+  "extraKnownMarketplaces": {
+    "workflow-kit-marketplace": {
+      "source": {
+        "source": "directory",
+        "path": "./workflow-kit"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "workflow-kit@workflow-kit-marketplace": true
   }
 }
