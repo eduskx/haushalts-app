@@ -19,4 +19,4 @@ Write throwaway scripts only under `test-results/`. Do not change application co
 
 A criterion passes only if you saw it work. If you could not run a check, report it as not run, not as passed. Say plainly that this browser is not iOS Safari: installation, push and camera need the human checklist.
 
-Return only JSON matching `schemas/verdict.schema.json`, written in `project.language`, with screenshot paths in `evidence`.
+Return only JSON matching the `verdict` schema, written in `project.language`, with screenshot paths in `evidence`. The orchestrator includes that schema in your task. Without an orchestrator, it ships with this plugin, not with the project.

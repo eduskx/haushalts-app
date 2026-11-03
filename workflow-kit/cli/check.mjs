@@ -112,9 +112,18 @@ export function findCommandBlocker(env) {
   return names.length > 0 ? `The environment holds credentials: ${names.join(', ')}` : null
 }
 
+// An allowlist, so that a credential under an unexpected name stays out as well.
+export const strippedEnv = (env) =>
+  Object.fromEntries(PASSED_ENV.filter((name) => env[name]).map((name) => [name, env[name]]))
+
 export function runCheckCommand({ command, cwd, env }) {
-  const stripped = Object.fromEntries(PASSED_ENV.filter((name) => env[name]).map((name) => [name, env[name]]))
-  const result = spawnSync(command, { shell: true, cwd, env: stripped, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
+  const result = spawnSync(command, {
+    shell: true,
+    cwd,
+    env: strippedEnv(env),
+    encoding: 'utf8',
+    maxBuffer: 256 * 1024 * 1024,
+  })
   const passed = result.status === 0
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`.slice(-OUTPUT_TAIL)
   return passed ? { status: 'passed', code: 0 } : { status: 'failed', code: result.status, output }

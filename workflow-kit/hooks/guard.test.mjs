@@ -86,6 +86,27 @@ describe('checkCommand', () => {
     assert.equal(checkCommand('cp a.txt workflow-kit-notes/b.txt', agent), null)
   })
 
+  it('lets an agent write only the protected paths its ticket allows', () => {
+    const agent = { agentMode: true, protectedPaths: ['CLAUDE.md', '.github/'], allowedPaths: ['.github/ci.yml'] }
+    assert.equal(checkCommand('sed -i s/a/b/ .github/ci.yml', agent), null)
+    assert.equal(checkCommand('echo x > ./.github/ci.yml', agent), null)
+    assert.ok(checkCommand('echo x > .github/other.yml', agent))
+    assert.ok(checkCommand('sed -i s/a/b/ .github/ci.yml CLAUDE.md', agent))
+  })
+
+  it('treats an allowed folder as everything inside it, but not a way out of it', () => {
+    const agent = { agentMode: true, protectedPaths: ['CLAUDE.md', 'locked/', '.github/'], allowedPaths: ['.github/'] }
+    assert.equal(checkCommand('rm .github/a/b.yml', agent), null)
+    assert.ok(checkCommand('rm .github/../locked/a.md', agent))
+    assert.ok(checkCommand('cp x .github/a.yml && rm CLAUDE.md', agent))
+  })
+
+  it('never lets allowed paths lift the rules for pushing and gh', () => {
+    const agent = { agentMode: true, protectedPaths: [], allowedPaths: ['.github/'] }
+    assert.ok(checkCommand('git push origin feature', agent))
+    assert.ok(checkCommand('gh pr view .github/', agent))
+  })
+
   it('does not mistake other words for gh in agent mode', () => {
     assert.equal(checkCommand('pnpm high-score', { agentMode: true }), null)
   })
@@ -116,6 +137,20 @@ describe('checkPath', () => {
     assert.equal(checkPath('Write', 'workflow-kit-notes.md', agent), null)
     assert.ok(checkPath('Write', path.join(projectDir, '.claude/worktrees/t1/CLAUDE.md'), agent))
     assert.equal(checkPath('Write', path.join(projectDir, '.claude/worktrees/t1/src/a.ts'), agent), null)
+  })
+
+  it('keeps env files closed even if a ticket allows them', () => {
+    assert.ok(checkPath('Write', '.env', { projectDir, agentMode: true, allowedPaths: ['.env'] }))
+  })
+
+  it('opens only the allowed protected paths in agent mode', () => {
+    const agent = { projectDir, protectedPaths: ['workflow-kit/', 'CLAUDE.md'], agentMode: true }
+    const allowed = { ...agent, allowedPaths: ['workflow-kit/a.md'] }
+    assert.equal(checkPath('Write', 'workflow-kit/a.md', allowed), null)
+    assert.equal(checkPath('Write', path.join(projectDir, '.claude/worktrees/t1/workflow-kit/a.md'), allowed), null)
+    assert.ok(checkPath('Write', 'workflow-kit/b.md', allowed))
+    assert.ok(checkPath('Write', 'CLAUDE.md', allowed))
+    assert.ok(checkPath('Write', 'workflow-kit/../CLAUDE.md', { ...agent, allowedPaths: ['workflow-kit/'] }))
   })
 })
 
@@ -149,5 +184,17 @@ describe('hook scripts', () => {
     const env = { CLAUDE_PROJECT_DIR: projectDir }
     assert.equal(run('guard-paths.mjs', input, { ...env, WF_AGENT: '1' }).status, 2)
     assert.equal(run('guard-paths.mjs', input, env).status, 0)
+  })
+
+  it('reads allowed paths from WF_ALLOW_PROTECTED', () => {
+    const projectDir = mkdtempSync(path.join(tmpdir(), 'guard-'))
+    writeFileSync(path.join(projectDir, 'project.config.json'), JSON.stringify({ protectedPaths: ['locked.md'] }))
+    const env = { CLAUDE_PROJECT_DIR: projectDir, WF_AGENT: '1', WF_ALLOW_PROTECTED: 'other.md,locked.md' }
+    const edit = JSON.stringify({ tool_name: 'Edit', tool_input: { file_path: 'locked.md' } })
+    const shell = JSON.stringify({ tool_input: { command: 'echo x > locked.md' } })
+    assert.equal(run('guard-paths.mjs', edit, env).status, 0)
+    assert.equal(run('guard-bash.mjs', shell, env).status, 0)
+    assert.equal(run('guard-paths.mjs', edit, { ...env, WF_ALLOW_PROTECTED: '' }).status, 2)
+    assert.equal(run('guard-bash.mjs', shell, { ...env, WF_ALLOW_PROTECTED: '' }).status, 2)
   })
 })

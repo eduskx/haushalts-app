@@ -1,4 +1,4 @@
-import { checkPath, isAgentMode, loadProtectedPaths, runHook } from './guard-lib.mjs'
+import { checkPath, isAgentMode, loadAllowedPaths, loadProtectedPaths, runHook } from './guard-lib.mjs'
 
 await runHook((input) => {
   const filePath = input.tool_input?.file_path ?? input.tool_input?.notebook_path
@@ -7,6 +7,7 @@ await runHook((input) => {
   return checkPath(input.tool_name, filePath, {
     projectDir,
     protectedPaths: loadProtectedPaths(projectDir),
+    allowedPaths: loadAllowedPaths(),
     agentMode: isAgentMode(),
   })
 })

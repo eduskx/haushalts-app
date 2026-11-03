@@ -1,6 +1,10 @@
 // Shared by the tests of wf.
 export const config = {
   project: { name: 'demo', language: 'en', repo: 'owner/demo' },
+  commands: { install: 'install-cmd', check: 'check-cmd' },
+  limits: { maxDiffLines: 300, maxFixRounds: 2 },
+  protectedPaths: ['locked/', 'LOCK.md'],
+  docs: { spec: 'docs/spec.md', moduleContract: 'docs/contract.md', adrDir: 'docs/adr/' },
   tracker: {
     adapter: 'linear',
     team: 'TEAM',
@@ -38,6 +42,7 @@ export function ticket(identifier, fields = {}) {
 export function fakeTracker(tickets) {
   return {
     tickets,
+    getTicket: async (identifier) => tickets.find((candidate) => candidate.identifier === identifier),
     listReadyTickets: async () => tickets.filter(({ status }) => status === config.tracker.statuses.ready),
   }
 }
