@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/*.mjs"],
+      "project": ["scripts/*.mjs"]
+    },
+    "packages/kit/*": {
+      "project": ["**/*.{ts,tsx,mjs}"]
+    },
+    "packages/features/*": {
+      "project": ["**/*.{ts,tsx,mjs}"]
+    },
+    "apps/*": {
+      "project": ["**/*.{ts,tsx,mjs}"]
+    }
+  }
+}
