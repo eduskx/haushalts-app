@@ -57,7 +57,14 @@
     "docs/design/hig-checklist.md",
     ".dependency-cruiser.cjs",
     "knip.json",
-    "packages/kit/config/"
+    "packages/kit/config/",
+    "package.json",
+    "pnpm-workspace.yaml",
+    "turbo.json",
+    "scripts/",
+    ".claude/settings.json",
+    "docs/specs/",
+    "docs/module-contract.md"
   ],
   "destructiveSql": ["\\bdrop\\s+(table|column|schema)\\b", "\\btruncate\\b", "\\bdisable\\s+row\\s+level\\s+security\\b", "\\bdelete\\s+from\\b(?![\\s\\S]*\\bwhere\\b)"],
   "forbiddenTerms": {

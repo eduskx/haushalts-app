@@ -25,6 +25,15 @@ describe('checkCommand', () => {
     'gh pr merge 3 --squash',
     'gh api repos/a/b/statuses/abc -f state=success',
     'echo ok && git push origin main',
+    'git -C . push origin main',
+    'git push origin main:refs/heads/main',
+    'git push origin +main',
+    'git push origin main;',
+    'git push origin +feature',
+    'cat .env',
+    'source apps/web/.env.local',
+    'grep KEY < .env',
+    'GH_TOKEN=x gh pr merge 3',
   ]
   for (const command of blocked) {
     it(`blocks: ${command}`, () => assert.ok(checkCommand(command)))
@@ -40,6 +49,9 @@ describe('checkCommand', () => {
     'gh pr view 3',
     'pnpm check',
     'echo "main"',
+    'git commit -m "docs: gh pr merge erklaert"',
+    'cat .env.example',
+    'cat .environment',
   ]
   for (const command of allowed) {
     it(`allows: ${command}`, () => assert.equal(checkCommand(command), null))
@@ -49,6 +61,29 @@ describe('checkCommand', () => {
     assert.ok(checkCommand('git push -u origin feature', { agentMode: true }))
     assert.ok(checkCommand('gh issue list', { agentMode: true }))
     assert.ok(checkCommand('ls && gh pr view 1', { agentMode: true }))
+  })
+
+  it('blocks gh behind an env variable in agent mode', () => {
+    assert.ok(checkCommand('GH_TOKEN=x gh pr view 1', { agentMode: true }))
+  })
+
+  it('blocks shell writes to protected paths in agent mode only', () => {
+    const protectedPaths = ['CLAUDE.md', 'project.config.json', 'workflow-kit/']
+    const agent = { agentMode: true, protectedPaths }
+    for (const command of [
+      'sed -i s/a/b/ CLAUDE.md',
+      "sed -i '' s/a/b/ CLAUDE.md",
+      'echo x >> project.config.json',
+      'echo x > ./CLAUDE.md',
+      'rm workflow-kit/agents/x.md',
+      'tee workflow-kit/x.md',
+    ]) {
+      assert.ok(checkCommand(command, agent), command)
+      assert.equal(checkCommand(command, { protectedPaths }), null, command)
+    }
+    assert.equal(checkCommand('cat CLAUDE.md', agent), null)
+    assert.equal(checkCommand('echo x > notes/CLAUDE.md.bak', agent), null)
+    assert.equal(checkCommand('cp a.txt workflow-kit-notes/b.txt', agent), null)
   })
 
   it('does not mistake other words for gh in agent mode', () => {
@@ -79,6 +114,8 @@ describe('checkPath', () => {
     assert.equal(checkPath('Read', 'CLAUDE.md', agent), null)
     assert.equal(checkPath('Write', 'packages/kit/ui/index.ts', agent), null)
     assert.equal(checkPath('Write', 'workflow-kit-notes.md', agent), null)
+    assert.ok(checkPath('Write', path.join(projectDir, '.claude/worktrees/t1/CLAUDE.md'), agent))
+    assert.equal(checkPath('Write', path.join(projectDir, '.claude/worktrees/t1/src/a.ts'), agent), null)
   })
 })
 
