@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ImplementerResult",
+  "description": "Returned by the implementer. The orchestrator acts on it.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary"],
+      "properties": {
+        "status": { "const": "done" },
+        "summary": { "type": "string", "minLength": 1, "description": "What changed, which test covers which criterion, and anything left open." }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "question"],
+      "properties": {
+        "status": { "const": "blocked" },
+        "question": { "type": "string", "minLength": 1, "description": "One concrete question a human can answer. It goes to the next intake round." }
+      }
+    }
+  ]
+}

@@ -27,19 +27,31 @@ const AGENT_BLOCKED = [
 // Shell commands that write to their file arguments. Best effort: a script can still get around it.
 const WRITES_FILES = /(?:>|\b(?:sed\s+(?:-\S+\s+)*-i|tee|mv|cp|rm|ln|chmod|truncate|dd)\b)/
 
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+// Removes the paths a ticket may change, so that only the others can trigger a block.
+// A path with ".." stays in, because it can lead out of the allowed folder.
+function withoutAllowedPaths(command, allowedPaths) {
+  return allowedPaths.reduce((rest, entry) => {
+    const tail = entry.endsWith('/') ? String.raw`[^\s;&|'")]*` : ''
+    const pattern = new RegExp(`(?<=^|[\\s<>'"=])(?:\\./)?${escapeRegex(entry)}${tail}(?=$|[\\s;&|'")])`, 'g')
+    return rest.replace(pattern, (match) => (match.includes('..') ? match : ' '))
+  }, command)
+}
+
 function writesProtectedPath(command, protectedPaths) {
   if (!WRITES_FILES.test(command)) return null
   return protectedPaths.find((entry) => {
-    const escaped = entry.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const escaped = escapeRegex(entry)
     return new RegExp(`(?:^|[\\s<>'"=/])(?:\\./)?${escaped}(?:$|[\\s;&|'")]|(?<=/)\\S)`).test(command)
   })
 }
 
-export function checkCommand(command, { agentMode = false, protectedPaths = [] } = {}) {
+export function checkCommand(command, { agentMode = false, protectedPaths = [], allowedPaths = [] } = {}) {
   const rules = agentMode ? [...ALWAYS_BLOCKED, ...AGENT_BLOCKED] : ALWAYS_BLOCKED
   const reason = rules.find((rule) => rule.pattern.test(command))?.reason
   if (reason) return reason
-  const hit = agentMode ? writesProtectedPath(command, protectedPaths) : null
+  const hit = agentMode ? writesProtectedPath(withoutAllowedPaths(command, allowedPaths), protectedPaths) : null
   return hit ? `${hit} is a protected path. Report that it needs changing instead.` : null
 }
 
@@ -49,18 +61,19 @@ function toRelative(filePath, projectDir) {
   return relative.split(path.sep).join('/').replace(/^\.claude\/worktrees\/[^/]+\//, '')
 }
 
-function matchesEntry(relative, entry) {
+export function matchesEntry(relative, entry) {
   return entry.endsWith('/') ? relative.startsWith(entry) : relative === entry
 }
 
-export function checkPath(tool, filePath, { projectDir, protectedPaths = [], agentMode = false }) {
+export function checkPath(tool, filePath, { projectDir, protectedPaths = [], allowedPaths = [], agentMode = false }) {
   const relative = toRelative(filePath, projectDir)
   const name = path.posix.basename(relative)
 
   if (/^\.env(\..+)?$/.test(name) && name !== '.env.example') {
     return `${relative} may contain secrets and is off limits.`
   }
-  if (agentMode && tool !== 'Read' && protectedPaths.some((entry) => matchesEntry(relative, entry))) {
+  const isAllowed = allowedPaths.some((entry) => matchesEntry(relative, entry))
+  if (agentMode && tool !== 'Read' && !isAllowed && protectedPaths.some((entry) => matchesEntry(relative, entry))) {
     return `${relative} is a protected path. Report that it needs changing instead.`
   }
   return null
@@ -93,3 +106,6 @@ export async function runHook(decide) {
 }
 
 export const isAgentMode = () => process.env.WF_AGENT === '1'
+
+// Set by the orchestrator from the ticket's allowProtected line.
+export const loadAllowedPaths = () => (process.env.WF_ALLOW_PROTECTED ?? '').split(',').filter(Boolean)

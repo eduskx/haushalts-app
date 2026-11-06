@@ -11,7 +11,7 @@ A reusable agent pipeline for Claude Code. Everything project-specific lives in 
 | `hooks/` | Blocks dangerous commands and protected-path edits. Guards against accidents, not a security boundary | ready, tested |
 | `schemas/` | Config schema and the JSON the agents must return | ready |
 | `templates/` | CI and PR templates, CLAUDE.md skeleton | ready |
-| `cli/` | `wf`, the deterministic orchestrator | planned for phase 4 |
+| `cli/` | `wf`, the deterministic orchestrator. Run with `node workflow-kit/cli/wf.mjs <command>` | `next`, `check` and `block` ready, `run` to come |
 
 ## How a ticket flows
 
@@ -36,9 +36,11 @@ A ticket is startable when it is in the ready status, has neither `needsHuman` n
 | `humanTask` | Only a human can do it | Instead of a run | Never takes it |
 | `humanReview` | The human judges the result | After the PR | Builds it, no auto-merge |
 
-Run the `intake` skill before a pipeline run. It asks everything at once and stores the answers in the ticket, so unattended runs have no reason to stop. If an agent still hits an open question, `wf` writes it to the ticket's questions section and sets `needsHuman`, and the next intake round asks it. This return path arrives with `wf`.
+Run the `intake` skill before a pipeline run. It asks everything at once and stores the answers in the ticket, so unattended runs have no reason to stop. If an agent still hits an open question, `wf` writes it to the ticket's questions section and sets `needsHuman`, and the next intake round asks it. The same happens when `limits.maxFixRounds` are used up or the result is invalid. The ticket returns to the ready status, because intake only loads that status. `wf block <ticket> <question>` does this by hand.
 
 Agents never push, merge or set statuses. They return commits and JSON, and `wf` acts. Run agents somewhere without GitHub or tracker credentials and without production secrets.
+
+`wf check` has two halves. The diff rules (`limits.maxDiffLines`, tests and lockfiles excluded, `protectedPaths`, `destructiveSql`, `forbiddenTerms`) only read git and run no project code, and they take their config from the base branch, so a diff cannot loosen them. `commands.check` runs code an agent wrote, so it only starts where `WF_SANDBOX=1` is set and no credential is in the environment, and then with a stripped environment. The marker prevents accidents, it proves nothing: credentials such as a `gh` login in the system keyring are invisible to it. Only the sandbox itself keeps them out. Where credentials exist, use `--diff-only`. Judge the human decision outside the sandbox with the kit from the base branch, because code inside the sandbox can be changed by the agent.
 
 Tickets live in Linear, code and pull requests on GitHub. Linear is currently the only tracker adapter, and `tracker` in the config is where another one would plug in.
 
@@ -54,6 +56,8 @@ Until `wf init` exists:
 4. Copy `templates/github/` to `.github/` and `templates/ci.yml` to `.github/workflows/ci.yml`, then adapt the commands. The template reads the Node version from `.nvmrc`.
 5. Write the project's own module contract at `docs.moduleContract`.
 6. In Linear, create the project and the labels named in the config, including `humanTask` and `humanReview`. Connect Linear to GitHub so that pull requests link to tickets.
+
+Agents read the values of the config keys they name, the ticket and the schema of their result from the task `wf` hands them. `wf` runs them with an allowlisted environment, `WF_AGENT=1` and the ticket's `allowProtected` paths in `WF_ALLOW_PROTECTED`. An `allowProtected` line only counts in the answers section. Only the ticket description and comments of `tracker.allowedAuthors` reach agents. The tracker does not say who last edited a description, so the workspace must stay closed to others.
 
 Plugins cannot ship permissions, and plugin agents ignore `permissionMode` and their own hooks. So `wf` sets the mode on each `claude -p` call, and hooks live at plugin level.
 

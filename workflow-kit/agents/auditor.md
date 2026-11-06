@@ -19,4 +19,4 @@ Look for:
 
 Each finding must name files and what concretely goes wrong. Skip anything you cannot back up. Findings that require the same fix go together in one ticket.
 
-Return only JSON matching `schemas/ticket-plan.schema.json`, written in `project.language`. An empty ticket list is a valid and good result.
+Return only JSON matching the `ticket-plan` schema, written in `project.language`. The orchestrator includes that schema in your task. Without an orchestrator, it ships with this plugin, not with the project. An empty ticket list is a valid and good result.
