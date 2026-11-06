@@ -71,8 +71,10 @@ async function check({ root, env, values, out }) {
 }
 
 async function block({ root, env, tracker, positionals, out }) {
-  const [, identifier, question] = positionals
-  if (!identifier || !question?.trim()) {
+  // Joined, so that an unquoted question keeps every word.
+  const [, identifier, ...words] = positionals
+  const question = words.join(' ')
+  if (!identifier || !question.trim()) {
     out(USAGE)
     return 2
   }

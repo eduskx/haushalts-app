@@ -60,6 +60,12 @@ describe('wf block', () => {
     assert.ok(tickets[0].labels.includes('needs-human'))
   })
 
+  it('keeps every word of an unquoted question', async () => {
+    const tickets = [ticket('T-1')]
+    await run(['block', 'T-1', 'Which', 'color', 'fits?'], tickets)
+    assert.match(tickets[0].description, /- \[ \] Which color fits\?/)
+  })
+
   it('needs a ticket and a question', async () => {
     assert.equal((await run(['block', 'T-1'], [ticket('T-1')])).code, 2)
     assert.equal((await run(['block', 'T-1', '  '], [ticket('T-1')])).code, 2)
