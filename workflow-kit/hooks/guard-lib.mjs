@@ -49,7 +49,7 @@ function toRelative(filePath, projectDir) {
   return relative.split(path.sep).join('/').replace(/^\.claude\/worktrees\/[^/]+\//, '')
 }
 
-function matchesEntry(relative, entry) {
+export function matchesEntry(relative, entry) {
   return entry.endsWith('/') ? relative.startsWith(entry) : relative === entry
 }
 

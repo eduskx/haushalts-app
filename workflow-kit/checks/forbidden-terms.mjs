@@ -17,9 +17,14 @@ function isBinary(content) {
   return content.includes(0)
 }
 
-export function findForbiddenTerms(projectDir) {
+function readRules(projectDir) {
   const config = JSON.parse(readFileSync(path.join(projectDir, 'project.config.json'), 'utf8'))
-  const { paths = [], terms = [] } = config.forbiddenTerms ?? {}
+  return config.forbiddenTerms ?? {}
+}
+
+// Pass rules to judge a checkout by a config other than its own.
+export function findForbiddenTerms(projectDir, rules = readRules(projectDir)) {
+  const { paths = [], terms = [] } = rules
   const findings = []
 
   for (const root of paths) {
