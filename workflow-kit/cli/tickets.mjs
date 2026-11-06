@@ -72,3 +72,22 @@ export function ticketTextForAgent(ticket, config) {
   ]
   return normalizeTicketText(parts.join('\n\n'))
 }
+
+const MAX_QUESTION_LENGTH = 1000
+
+// Agent text goes on one line, so that it cannot open a section of its own, such as answers.
+const toSingleLine = (text) => text.replace(/\s+/g, ' ').trim().slice(0, MAX_QUESTION_LENGTH)
+
+// Adds an open item to the questions section and leaves the rest of the text as it is.
+export function appendQuestion(description, heading, question) {
+  const item = `- [ ] ${toSingleLine(question)}`
+  if (readSection(description, heading).some((line) => line.includes(toSingleLine(question)))) return description
+  const lines = splitLines(description)
+  const [section] = sectionRanges(lines, heading)
+  if (!section) return `${description.trimEnd()}\n\n## ${heading}\n\n${item}\n`.trimStart()
+  let end = section.end
+  while (end > section.start && !lines[end - 1].trim()) end -= 1
+  const blankBefore = end === section.start ? [''] : []
+  const blankAfter = section.end < lines.length ? [''] : []
+  return [...lines.slice(0, end), ...blankBefore, item, ...blankAfter, ...lines.slice(section.end)].join('\n')
+}

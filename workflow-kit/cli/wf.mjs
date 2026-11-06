@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util'
 import { findCommandBlocker, inspectDiff, loadConfigAt, resolveBase, runCheckCommand } from './check.mjs'
 import { loadConfig, repoRoot } from './config.mjs'
 import { selectNext } from './next.mjs'
+import { askHuman } from './return-path.mjs'
 import { createLinearTracker } from './tracker-linear.mjs'
 
 const USAGE = `Usage: wf <command> [--json]
@@ -14,6 +15,8 @@ const USAGE = `Usage: wf <command> [--json]
           --base <ref>            Base to compare with, default origin/HEAD
           --allow-protected <p>   Comma-separated protected paths this ticket may change
           --diff-only             Skip commands.check, for places that hold credentials
+  block <ticket> <question>
+          Write the question to the ticket and hand it to the next intake round
 `
 
 function createTracker(config, env) {
@@ -67,7 +70,21 @@ async function check({ root, env, values, out }) {
   return result.ok ? 0 : 1
 }
 
-const COMMANDS = { next, check }
+async function block({ root, env, tracker, positionals, out }) {
+  // Joined, so that an unquoted question keeps every word.
+  const [, identifier, ...words] = positionals
+  const question = words.join(' ')
+  if (!identifier || !question.trim()) {
+    out(USAGE)
+    return 2
+  }
+  const config = loadConfig(root)
+  await askHuman({ tracker: tracker ?? createTracker(config, env), config, identifier, question })
+  out(`${identifier} now waits for intake.`)
+  return 0
+}
+
+const COMMANDS = { next, check, block }
 
 // Returns the exit code. The dependencies can be replaced in tests.
 export async function main(argv, { env = process.env, cwd = process.cwd(), out = console.log, tracker } = {}) {
@@ -86,7 +103,7 @@ export async function main(argv, { env = process.env, cwd = process.cwd(), out =
     out(USAGE)
     return 2
   }
-  return command({ root: repoRoot(cwd), env, tracker, values, out })
+  return command({ root: repoRoot(cwd), env, tracker, values, positionals, out })
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -41,6 +41,23 @@ const ONE_TICKET = `
   }
 `
 
+const LOOKUP_IDS = `
+  query LookupIds($team: String!, $status: String!, $label: String!) {
+    workflowStates(first: 5, filter: { team: { key: { eq: $team } }, name: { eq: $status } }) {
+      nodes { id }
+    }
+    issueLabels(first: 20, filter: { name: { eqIgnoreCase: $label } }) {
+      nodes { id team { key } }
+    }
+  }
+`
+
+const UPDATE_TICKET = `
+  mutation UpdateTicket($id: String!, $input: IssueUpdateInput!) {
+    issueUpdate(id: $id, input: $input) { success }
+  }
+`
+
 function toTicket(issue) {
   return {
     id: issue.id,
@@ -86,6 +103,21 @@ export function createLinearTracker({ apiKey, config, fetch = globalThis.fetch }
     async getTicket(identifier) {
       const { issue } = await request(ONE_TICKET, { identifier })
       return toTicket(issue)
+    },
+
+    // One mutation, so that a question never lands without its label or the other way round.
+    async updateTicket(ticket, { description, status, addLabel }) {
+      const { team } = config.tracker
+      const { workflowStates, issueLabels } = await request(LOOKUP_IDS, { team, status, label: addLabel })
+      const stateId = workflowStates.nodes[0]?.id
+      // A team's own label wins over a workspace label of the same name.
+      const label =
+        issueLabels.nodes.find((node) => node.team?.key === team) ?? issueLabels.nodes.find((node) => !node.team)
+      if (!stateId) throw new Error(`Status "${status}" does not exist in team ${team}.`)
+      if (!label) throw new Error(`Label "${addLabel}" does not exist in team ${team}.`)
+      const input = { description, stateId, addedLabelIds: [label.id] }
+      const { issueUpdate } = await request(UPDATE_TICKET, { id: ticket.id, input })
+      if (!issueUpdate.success) throw new Error(`Linear did not update ${ticket.identifier}.`)
     },
 
     async listReadyTickets() {
