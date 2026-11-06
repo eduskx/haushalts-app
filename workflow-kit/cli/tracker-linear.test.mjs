@@ -86,6 +86,21 @@ describe('createLinearTracker', () => {
     assert.equal(requests[1].variables.after, 'cursor')
   })
 
+  it('loads one ticket with its comments', async () => {
+    const data = issue('T-1', {
+      comments: {
+        nodes: [
+          { body: 'Hi', createdAt: '2026-01-02T00:00:00.000Z', user: { id: 'allowed-user' } },
+          { body: 'Bot', createdAt: '2026-01-03T00:00:00.000Z', user: null },
+        ],
+      },
+    })
+    const { requests, instance } = tracker([{ ok: true, status: 200, json: async () => ({ data: { issue: data } }) }])
+    const ticket = await instance.getTicket('T-1')
+    assert.equal(requests[0].variables.identifier, 'T-1')
+    assert.deepEqual(ticket.comments.map(({ authorId }) => authorId), ['allowed-user', null])
+  })
+
   it('reports API errors without the key', async () => {
     const { instance } = tracker([
       { ok: false, status: 400, statusText: 'Bad', json: async () => ({ errors: [{ message: 'Query too complex' }] }) },

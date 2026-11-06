@@ -32,6 +32,15 @@ const READY_TICKETS = `
   }
 `
 
+const ONE_TICKET = `
+  query OneTicket($identifier: String!) {
+    issue(id: $identifier) {
+      ${TICKET_FIELDS}
+      comments(first: 50) { nodes { body createdAt user { id } } }
+    }
+  }
+`
+
 function toTicket(issue) {
   return {
     id: issue.id,
@@ -46,6 +55,13 @@ function toTicket(issue) {
     blockedBy: issue.inverseRelations.nodes
       .filter(({ type }) => type === 'blocks')
       .map(({ issue: blocker }) => ({ identifier: blocker.identifier, status: blocker.state.name })),
+    ...(issue.comments && {
+      comments: issue.comments.nodes.map(({ body, createdAt, user }) => ({
+        body,
+        createdAt,
+        authorId: user?.id ?? null,
+      })),
+    }),
   }
 }
 
@@ -67,6 +83,11 @@ export function createLinearTracker({ apiKey, config, fetch = globalThis.fetch }
   }
 
   return {
+    async getTicket(identifier) {
+      const { issue } = await request(ONE_TICKET, { identifier })
+      return toTicket(issue)
+    },
+
     async listReadyTickets() {
       const { team, project, statuses } = config.tracker
       const tickets = []

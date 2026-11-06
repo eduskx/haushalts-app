@@ -57,6 +57,8 @@ Until `wf init` exists:
 5. Write the project's own module contract at `docs.moduleContract`.
 6. In Linear, create the project and the labels named in the config, including `humanTask` and `humanReview`. Connect Linear to GitHub so that pull requests link to tickets.
 
+Agents read the values of the config keys they name, the ticket and the schema of their result from the task `wf` hands them. `wf` runs them with an allowlisted environment, `WF_AGENT=1` and the ticket's `allowProtected` paths in `WF_ALLOW_PROTECTED`. An `allowProtected` line only counts in the answers section. Only the ticket description and comments of `tracker.allowedAuthors` reach agents. The tracker does not say who last edited a description, so the workspace must stay closed to others.
+
 Plugins cannot ship permissions, and plugin agents ignore `permissionMode` and their own hooks. So `wf` sets the mode on each `claude -p` call, and hooks live at plugin level.
 
 ## Rules for changing the kit

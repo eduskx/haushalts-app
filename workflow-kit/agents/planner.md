@@ -17,4 +17,4 @@ Rules:
 - Add the `ui` label only when a user can see the change.
 - If the spec leaves a ticket ambiguous, add the question to that ticket's `humanInput` instead of guessing. Use `openQuestions` only for questions about the plan as a whole.
 
-Write tickets in `project.language`. Return only JSON matching `schemas/ticket-plan.schema.json`.
+Write tickets in `project.language`. Return only JSON matching the `ticket-plan` schema. The orchestrator includes that schema in your task. Without an orchestrator, it ships with this plugin, not with the project.
