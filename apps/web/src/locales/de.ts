@@ -1,4 +1,6 @@
 export const de = {
+  "app.name": "Haushalts-App",
+  "app.shortName": "Haushalt",
   "home.title": "Willkommen",
   "home.intro": "Hier entsteht eure Haushalts-App.",
   "notFound.title": "Seite nicht gefunden",
