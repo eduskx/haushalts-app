@@ -19,6 +19,10 @@ Needs Node 26 (see `.nvmrc`), pnpm 10 and, for the database, Docker and the Supa
 - Modulgrenzen: [docs/module-contract.md](docs/module-contract.md)
 - Workflow in andere Projekte mitnehmen: [workflow-kit/README.md](workflow-kit/README.md)
 
+## Deployment
+
+Vercel builds every push through its GitHub integration: each PR gets an HTTPS preview URL, `main` goes to production. Build command, output directory and the SPA fallback (unknown paths serve `index.html`) live in [vercel.json](vercel.json). Vercel credentials stay in the Vercel project, never in the repo.
+
 ## Local database
 
 Local Supabase is for development and tests only. Needs Docker and the Supabase CLI.
