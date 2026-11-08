@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#48427F"/>
+  <!-- House kept inside the central 80% so the maskable variant survives any mask shape. -->
+  <path d="M256 132 L376 236 V368 a16 16 0 0 1 -16 16 H152 a16 16 0 0 1 -16 -16 V236 Z" fill="#F0EDF2"/>
+  <path d="M256 352 c-40 -26 -60 -48 -60 -72 a30 30 0 0 1 60 -10 a30 30 0 0 1 60 10 c0 24 -20 46 -60 72 Z" fill="#E26D8C"/>
+</svg>
