@@ -11,6 +11,7 @@ Needs Node 26 (see `.nvmrc`), pnpm 10 and, for the database, Docker and the Supa
 - `pnpm install`: install all workspaces.
 - `pnpm --filter web dev`: start the app with Vite.
 - `pnpm --filter web build`: build the app into `apps/web/dist`.
+- `pnpm preview`: build the app and serve the production build on http://localhost:4173 (port set in `apps/web/vite.config.ts`). The tester agent uses this as `commands.preview`. `commands.e2e` (`pnpm e2e`) does not exist yet and comes with EDU-29.
 - `pnpm check`: typecheck, lint, tests and the module rules for the whole repo. `pnpm check:affected` does the same only for changed packages and their dependents.
 
 - Regeln für Agenten und Menschen: [CLAUDE.md](CLAUDE.md)

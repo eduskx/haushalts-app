@@ -15,7 +15,8 @@
     "db:start": "node scripts/db.mjs start",
     "db:stop": "node scripts/db.mjs stop",
     "db:test": "node scripts/db.mjs test",
-    "db:install-modules": "node scripts/db-migrations.mjs"
+    "db:install-modules": "node scripts/db-migrations.mjs",
+    "preview": "pnpm --filter web build && pnpm --filter web preview"
   },
   "devDependencies": {
     "dependency-cruiser": "^18.7.2",
