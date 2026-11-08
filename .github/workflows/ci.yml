@@ -1,5 +1,5 @@
 # Independent check of everything the local pipeline claims.
-# Supabase and E2E join in EDU-21 and EDU-29, once they exist.
+# E2E joins in EDU-29, once it exists.
 name: CI
 
 on:
