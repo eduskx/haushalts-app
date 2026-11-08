@@ -1,6 +1,6 @@
 // Accident guards for Claude Code hooks. Not a security boundary: see the kit README.
-import { readFileSync } from 'node:fs'
 import path from 'node:path'
+import { loadConfig } from '../cli/config.mjs'
 
 const COMMAND_START = String.raw`(?:^|[;&|(\n]\s*)(?:\w+=\S*\s+)*`
 const GIT_PUSH = String.raw`\bgit\s+(?:-[cC]\s+\S+\s+)*push\b[^;&|\n]*`
@@ -83,8 +83,7 @@ export function checkPath(tool, filePath, { projectDir, protectedPaths = [], all
 
 export function loadProtectedPaths(projectDir) {
   try {
-    const config = JSON.parse(readFileSync(path.join(projectDir, 'project.config.json'), 'utf8'))
-    return config.protectedPaths ?? []
+    return loadConfig(projectDir).protectedPaths ?? []
   } catch (error) {
     if (error.code === 'ENOENT') return []
     throw error

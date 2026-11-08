@@ -2,7 +2,16 @@
 
 Cozy Haushalts-App für Paare als PWA, und ein wiederverwendbarer Baukasten aus App-Modulen und Agenten-Workflow.
 
-Stand: Monorepo-Gerüst steht, noch kein App-Code.
+Status: the monorepo, `packages/kit/config`, `packages/kit/core`, the app shell in `apps/web` and the local Supabase with pgTAP are in place. `packages/features` and `apps/demo-wg` do not exist yet.
+
+## Setup and run
+
+Needs Node 26 (see `.nvmrc`), pnpm 10 and, for the database, Docker and the Supabase CLI.
+
+- `pnpm install`: install all workspaces.
+- `pnpm --filter web dev`: start the app with Vite.
+- `pnpm --filter web build`: build the app into `apps/web/dist`.
+- `pnpm check`: typecheck, lint, tests and the module rules for the whole repo. `pnpm check:affected` does the same only for changed packages and their dependents.
 
 - Regeln für Agenten und Menschen: [CLAUDE.md](CLAUDE.md)
 - Was gebaut wird: [docs/specs/v1.md](docs/specs/v1.md)

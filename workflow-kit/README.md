@@ -26,6 +26,8 @@ wf next -> oldest startable ticket by an allowed author
   -> wf sets status agent-review -> squash auto-merge
 ```
 
+This is the target flow. Today `wf` only runs `next`, `check` and `block`. Pushing, opening the PR, starting the agents, setting `agent-review`, auto-merge and the automatic return path after `limits.maxFixRounds` or an invalid result come with `wf run`. Until then a human or the main session does these steps by hand.
+
 A ticket is startable when it is in the ready status, has neither `needsHuman` nor `humanTask`, and all its blockers are done.
 
 ## When the human is involved
@@ -59,7 +61,7 @@ Until `wf init` exists:
 
 Agents read the values of the config keys they name, the ticket and the schema of their result from the task `wf` hands them. `wf` runs them with an allowlisted environment, `WF_AGENT=1` and the ticket's `allowProtected` paths in `WF_ALLOW_PROTECTED`. An `allowProtected` line only counts in the answers section. Only the ticket description and comments of `tracker.allowedAuthors` reach agents. The tracker does not say who last edited a description, so the workspace must stay closed to others.
 
-Plugins cannot ship permissions, and plugin agents ignore `permissionMode` and their own hooks. So `wf` sets the mode on each `claude -p` call, and hooks live at plugin level.
+Plugins cannot ship permissions, and plugin agents ignore `permissionMode` and their own hooks. So `wf run` will set the mode on each `claude -p` call, and hooks live at plugin level. `cli/agent.mjs` already builds the task and the allowlisted environment for that call.
 
 ## Rules for changing the kit
 

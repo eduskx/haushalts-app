@@ -9,7 +9,7 @@ const VALID_PATH = /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[\w.@/-]+$/
 const headingText = (text) => text.replace(/[*_:]+/g, ' ').trim().toLowerCase()
 
 // Locates sections by line, ignoring headings inside code fences.
-export function sectionRanges(lines, heading) {
+function sectionRanges(lines, heading) {
   const wanted = headingText(heading)
   const ranges = []
   let open = null
@@ -29,7 +29,7 @@ export function sectionRanges(lines, heading) {
   return ranges
 }
 
-export const splitLines = (text) => text.replace(/\r\n/g, '\n').split('\n')
+const splitLines = (text) => text.replace(/\r\n/g, '\n').split('\n')
 
 export function readSection(description, heading) {
   const lines = splitLines(description)
