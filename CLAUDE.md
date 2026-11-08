@@ -15,6 +15,8 @@ Dieses Repo liefert zwei gleichwertige Produkte: die App und einen wiederverwend
 
 Vor Arbeit an Modulen lies [docs/module-contract.md](docs/module-contract.md). Die Regeln prüfen Maschinen in `wf check`, ein grüner Check zählt mehr als eine Behauptung.
 
+Prüfungen und Reviews betreffen nur den Diff. Lokal und in Agenten-Workflows läuft `pnpm check:affected`: Typecheck, Lint und Tests nur für geänderte Pakete und alles, was von ihnen abhängt. Die komplette Suite (`pnpm check`) läuft nur in der CI vor dem Merge. Neue Workflows, Agenten und Skills halten sich daran.
+
 ## Stack
 
 Vite, React, React Router, TypeScript strict, Tailwind v4, TanStack Query, Supabase, Vercel, pnpm, Turborepo. Begründungen in [docs/adr/](docs/adr/).
