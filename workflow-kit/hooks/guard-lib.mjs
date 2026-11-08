@@ -16,10 +16,11 @@ const ALWAYS_BLOCKED = [
   { pattern: new RegExp(`${RM_RECURSIVE_FORCE}(?:/|~|\\$HOME|\\.|\\.\\.|\\*)(?:/?\\*?)(?:\\s|$)`), reason: 'Recursively deleting a root, home or working directory is not allowed.' },
   { pattern: new RegExp(ENV_FILE), reason: 'Env files may contain secrets and are off limits.' },
   { pattern: new RegExp(`${COMMAND_START}gh\\s+auth\\s+token\\b`), reason: 'Reading the GitHub token is not allowed.' },
-  { pattern: new RegExp(`${COMMAND_START}gh\\s+pr\\s+merge\\b`), reason: 'Merging is done by the orchestrator or a human.' },
   { pattern: new RegExp(`${COMMAND_START}gh\\s+api\\b[^;&|\\n]*/statuses/`), reason: 'Setting commit statuses is done by the orchestrator.' },
 ]
 
+// Merging is not listed above on purpose: the main session may merge after the human
+// approves in chat. Agents stay unable to merge because they cannot use gh at all.
 const AGENT_BLOCKED = [
   { pattern: new RegExp(`${COMMAND_START}gh\\s`), reason: 'Pipeline agents do not use gh. The orchestrator talks to GitHub.' },
   { pattern: new RegExp(GIT_PUSH), reason: 'Pipeline agents do not push. The orchestrator handles it.' },
