@@ -22,6 +22,10 @@ if (!steps) {
 }
 
 for (const args of steps) {
-  const { status } = spawnSync(cli, [...args, '--workdir', workdir], { stdio: 'inherit' })
+  const { status, error } = spawnSync(cli, [...args, '--workdir', workdir], { stdio: 'inherit' })
+  if (error) {
+    console.error(`Could not run the Supabase CLI: ${error.message}\nInstall it first: https://supabase.com/docs/guides/local-development/cli/getting-started`)
+    process.exit(1)
+  }
   if (status !== 0) process.exit(status ?? 1)
 }

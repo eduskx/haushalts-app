@@ -40,6 +40,37 @@ describe('db:install-modules', () => {
   })
 })
 
+describe('install order and versions', () => {
+  const kitModule = (root, name, deps = {}) => {
+    mkdirSync(path.join(root, `packages/kit/${name}/migrations`), { recursive: true })
+    writeFileSync(path.join(root, `packages/kit/${name}/package.json`), JSON.stringify({ name: `@kit/${name}`, dependencies: deps }))
+    writeFileSync(path.join(root, `packages/kit/${name}/migrations/0001_init.sql`), `select '${name}';`)
+  }
+
+  it('copies a dependency before the module that needs it', () => {
+    const root = repo()
+    kitModule(root, 'core')
+    kitModule(root, 'auth', { '@kit/core': 'workspace:*' })
+    const files = installModules(root, at('2026-11-08T10:00:00Z'))
+    assert.deepEqual(files.map((file) => file.split('_')[1]), ['core', 'auth'])
+  })
+
+  it('fails with a clear message on a dependency cycle', () => {
+    const root = repo()
+    kitModule(root, 'a', { '@kit/b': 'workspace:*' })
+    kitModule(root, 'b', { '@kit/a': 'workspace:*' })
+    assert.throws(() => installModules(root), /cycle/)
+  })
+
+  it('never reuses a version prefix within the same second', () => {
+    const root = repo()
+    const first = installModules(root, at('2026-11-08T10:00:00Z'))
+    writeFileSync(path.join(root, 'packages/kit/auth/migrations/0002_more.sql'), 'select 2;')
+    const second = installModules(root, at('2026-11-08T10:00:00Z'))
+    assert.ok(second[0].slice(0, 14) > first[0].slice(0, 14))
+  })
+})
+
 describe('migration hash comparison', () => {
   it('passes for untouched migrations', () => {
     const root = repo()
