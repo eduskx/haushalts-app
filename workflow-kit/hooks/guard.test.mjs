@@ -24,7 +24,6 @@ describe('checkCommand', () => {
     'rm -fr .',
     'rm -r -f $HOME',
     'gh auth token',
-    'gh pr merge 3 --squash',
     'gh api repos/a/b/statuses/abc -f state=success',
     'echo ok && git push origin main',
     'git -C . push origin main',
@@ -35,7 +34,6 @@ describe('checkCommand', () => {
     'cat .env',
     'source apps/web/.env.local',
     'grep KEY < .env',
-    'GH_TOKEN=x gh pr merge 3',
   ]
   for (const command of blocked) {
     it(`blocks: ${command}`, () => assert.ok(checkCommand(command)))
@@ -53,6 +51,7 @@ describe('checkCommand', () => {
     'rm -rf ./dist',
     'gh pr create --fill',
     'gh pr view 3',
+    'gh pr merge 3 --squash --delete-branch',
     'pnpm check',
     'echo "main"',
     'git commit -m "docs: gh pr merge erklaert"',
@@ -71,6 +70,11 @@ describe('checkCommand', () => {
 
   it('blocks gh behind an env variable in agent mode', () => {
     assert.ok(checkCommand('GH_TOKEN=x gh pr view 1', { agentMode: true }))
+  })
+
+  it('blocks merging in agent mode', () => {
+    assert.ok(checkCommand('gh pr merge 3 --squash', { agentMode: true }))
+    assert.ok(checkCommand('GH_TOKEN=x gh pr merge 3', { agentMode: true }))
   })
 
   it('blocks shell writes to protected paths in agent mode only', () => {
