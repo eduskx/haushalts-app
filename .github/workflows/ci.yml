@@ -27,6 +27,21 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
 
+  db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm db:test
+
   workflow-kit:
     runs-on: ubuntu-latest
     steps:

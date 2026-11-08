@@ -10,7 +10,11 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "check": "turbo run typecheck lint test && pnpm rules",
-    "rules": "depcruise packages --config .dependency-cruiser.cjs && knip && node workflow-kit/checks/forbidden-terms.mjs && node --test \"scripts/*.test.mjs\""
+    "rules": "depcruise packages --config .dependency-cruiser.cjs && knip && node workflow-kit/checks/forbidden-terms.mjs && node scripts/db-migrations.mjs verify && node --test \"scripts/*.test.mjs\"",
+    "db:start": "node scripts/db.mjs start",
+    "db:stop": "node scripts/db.mjs stop",
+    "db:test": "node scripts/db.mjs test",
+    "db:install-modules": "node scripts/db-migrations.mjs"
   },
   "devDependencies": {
     "dependency-cruiser": "^18.7.2",
