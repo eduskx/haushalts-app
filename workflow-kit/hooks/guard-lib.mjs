@@ -11,7 +11,8 @@ const ALWAYS_BLOCKED = [
   { pattern: new RegExp(`${GIT_PUSH}(?:\\s|:|\\+|refs/heads/)(?:main|master)(?=\\s|;|&|\\||$)`), reason: 'Pushing to the main branch is not allowed. Use a pull request.' },
   { pattern: new RegExp(`${GIT_PUSH}\\s(?:--force(?:-with-lease)?|-f|\\+\\S+)(?:\\s|=|$)`), reason: 'Force pushing is not allowed.' },
   { pattern: /(?:^|\s)--no-verify(?:\s|$)/, reason: 'Skipping git hooks is not allowed. Fix the cause instead.' },
-  { pattern: /\bgit\s+config\s+--global\b/, reason: 'Changing global git configuration is not allowed.' },
+  // Read-only options stay allowed, so agents can inspect the setup without being able to change it.
+  { pattern: /\bgit\s+config\s+--global\b(?!\s+(?:--get(?:-all|-regexp)?|--list|-l)(?=\s|$))/, reason: 'Changing global git configuration is not allowed.' },
   { pattern: new RegExp(`${RM_RECURSIVE_FORCE}(?:/|~|\\$HOME|\\.|\\.\\.|\\*)(?:/?\\*?)(?:\\s|$)`), reason: 'Recursively deleting a root, home or working directory is not allowed.' },
   { pattern: new RegExp(ENV_FILE), reason: 'Env files may contain secrets and are off limits.' },
   { pattern: new RegExp(`${COMMAND_START}gh\\s+auth\\s+token\\b`), reason: 'Reading the GitHub token is not allowed.' },
