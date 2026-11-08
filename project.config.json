@@ -31,7 +31,7 @@
   },
   "commands": {
     "install": "pnpm install --frozen-lockfile",
-    "check": "pnpm check",
+    "check": "pnpm check:affected",
     "e2e": "pnpm e2e",
     "preview": "pnpm preview"
   },
