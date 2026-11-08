@@ -44,9 +44,17 @@ Tickets liegen in Linear, im Projekt `haushalts-app`. Lege keine GitHub-Issues a
 
 Bevor Agenten an Tickets arbeiten, sammelt der Skill `workflow-kit:intake` alle offenen Fragen per Rückfrage ein und schreibt die Antworten ins Ticket. Die Bedeutung der Labels steht in [ADR 0008](docs/adr/0008-startbereitschaft-von-tickets.md).
 
+## Rückfragen an den Menschen
+
+Braucht Claude etwas vom Menschen (Entscheidung, Freigabe, Go, fehlende Information), fragt es ausnahmslos über ein klickbares Element, nie als Frage im Fließtext am Ende einer Nachricht. Eine Entscheidung mit zwei Möglichkeiten geht in die Next-Step-Box mit Buttons (`wrap_up` mit `ask` und `actions`, Empfehlung zuerst). Mehrere Fragen oder mehr als zwei Optionen gehen über `AskUserQuestion`. Gibt es beides nicht, steht die Frage fett in der ersten Zeile.
+
 ## Sprache
 
-Code, Bezeichner und Code-Kommentare auf Englisch. Oberfläche, Tickets, PRs und ADRs auf Deutsch. Oberflächentexte liegen immer in den Sprachdateien des Moduls, nie direkt im Code.
+Alles, was im Repo oder auf GitHub landet, ist englisch: Bezeichner, Kommentare, TSDoc, README, docs/, ADRs, Commit-Messages und PR-Texte. Das gilt für neue Inhalte. Bestehende deutsche Dateien und Commits bleiben, wie sie sind.
+
+Deutsch bleiben die Oberfläche und die Linear-Tickets. Oberflächentexte liegen immer in den Sprachdateien des Moduls, nie direkt im Code. Deutsche Fachbegriffe der Oberfläche bekommen im Code einen festen englischen Namen.
+
+Ausnahme: Texte, die die Workflow-Agenten erzeugen (Tickets, PR-Texte, Berichte), folgen `project.language` in [project.config.json](project.config.json).
 
 ## Sicherheit
 
