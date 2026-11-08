@@ -9,6 +9,24 @@
       "mcp__Linear__whoami",
       "mcp__Linear__save_comment",
       "mcp__Linear__save_project"
+    ],
+    "ask": [
+      "Edit(/.claude/settings.json)",
+      "Edit(/.dependency-cruiser.cjs)",
+      "Edit(/.github/**)",
+      "Edit(/CLAUDE.md)",
+      "Edit(/docs/adr/**)",
+      "Edit(/docs/design/hig-checklist.md)",
+      "Edit(/docs/module-contract.md)",
+      "Edit(/docs/specs/**)",
+      "Edit(/knip.json)",
+      "Edit(/package.json)",
+      "Edit(/packages/kit/config/**)",
+      "Edit(/pnpm-workspace.yaml)",
+      "Edit(/project.config.json)",
+      "Edit(/scripts/**)",
+      "Edit(/turbo.json)",
+      "Edit(/workflow-kit/**)"
     ]
   },
   "extraKnownMarketplaces": {
