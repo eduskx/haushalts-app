@@ -3,7 +3,9 @@ import { de } from "./de";
 import { t } from "./index";
 
 describe("t", () => {
-  it("returns the German text for a key", () => {
-    expect(t("home.title")).toBe(de["home.title"]);
+  it("has a non-empty text for every key", () => {
+    for (const key of Object.keys(de) as (keyof typeof de)[]) {
+      expect(t(key).trim(), key).not.toBe("");
+    }
   });
 });

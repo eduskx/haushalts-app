@@ -3,6 +3,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { loadConfig } from '../cli/config.mjs'
 
 const SKIPPED_DIRS = new Set(['node_modules', 'dist', 'coverage', '.turbo'])
 
@@ -18,8 +19,7 @@ function isBinary(content) {
 }
 
 function readRules(projectDir) {
-  const config = JSON.parse(readFileSync(path.join(projectDir, 'project.config.json'), 'utf8'))
-  return config.forbiddenTerms ?? {}
+  return loadConfig(projectDir).forbiddenTerms ?? {}
 }
 
 // Pass rules to judge a checkout by a config other than its own.

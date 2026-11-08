@@ -32,7 +32,7 @@ workflow-kit    Agenten-Workflow als Claude-Code-Plugin
 docs            Spec, ADRs, Design, Modul-Vertrag
 ```
 
-Stand: Monorepo-Gerüst steht, noch kein App-Code. Die Struktur oben ist der Zielzustand. Die freigegebene Spec liegt in [docs/specs/v1.md](docs/specs/v1.md).
+Status: `apps/web` (app shell), `packages/kit/config`, `packages/kit/core` and the local Supabase exist. `apps/demo-wg` and `packages/features` are still missing. The structure above is the target. Die freigegebene Spec liegt in [docs/specs/v1.md](docs/specs/v1.md).
 
 ## Nebenbei Erwähntes
 

@@ -8,7 +8,7 @@ const isReady = (ticket, { tracker }) => ticket.status === tracker.statuses.read
 
 const blockersDone = (ticket, { tracker }) => ticket.blockedBy.every(({ status }) => status === tracker.statuses.done)
 
-export function isStartable(ticket, config) {
+function isStartable(ticket, config) {
   const { needsHuman, humanTask } = config.tracker.labels
   return (
     isReady(ticket, config) &&
